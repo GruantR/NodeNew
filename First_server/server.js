@@ -26,7 +26,7 @@ app.post('/api/echo', (req,res)=>{
 // Создание (Create)
 // {
 //     "id":"1",
-//     "username": "Masha",
+//     "username": "Mash1a",
 //     "email":"ruslanusrulit@gmail.com",
 //     "password":"Qwe123"
 // }
