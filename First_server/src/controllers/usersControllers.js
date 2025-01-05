@@ -1,12 +1,15 @@
 const e = require("express");
 const UsersServices = require("../services/usersServices");
+const { v4: uuidv4 } = require('uuid'); // генератор id
 
 class UsersControllers {
   // Создание пользователь (create)
   createUsers(req, res) {
     const { id, username} = req.body;
-    UsersServices.createUser(req.body);
-    res.send(`Пользователь ${username} успешно создан, присвоен id: ${id}`);
+    //UsersServices.createUser(req.body);
+    const newId = uuidv4();
+    UsersServices.createUser({id:newId,...req.body});
+    res.send(`Пользователь ${username} успешно создан, присвоен id: ${newId}`);
   }
 
   // Получение списка всех пользователей (read)
