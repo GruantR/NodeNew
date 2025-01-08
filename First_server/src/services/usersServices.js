@@ -1,25 +1,27 @@
+const fs = require("fs");
+const FileHelper = require("../helpers/fileHelper");
 class UsersServices {
-  #userList = [];  // наша база данных, в данном случае массив объектов
-
-  // Метод добавления новых пользователей
-  createUser(data) {
-    this.#userList.push(data);
+  // Метод добавления (записи) новых пользователей:
+  async createUser(content) {
+    return await FileHelper.writeFile("example.json", content);
   }
 
-  // Метод для получения списка ВСЕХ пользователей (массив объектов)
-  getUsers() {
-    return this.#userList;
+  // Метод для получения (чтения) списка ВСЕХ пользователей: (массив объектов)
+  async getUsers() {
+    const result = await FileHelper.readFile("example.json");
+    return result;
   }
 
-  // Метод для получения данных КОНКРЕТНОГО пользователся (объект)
-  getUserByID(id) {
-    const findUser = this.#userList.find((item) => item.id === id);
-    return findUser;
+  // Метод для получения данных КОНКРЕТНОГО пользователя: (объект)
+  async getUserByID(id) {
+    const findUser = await FileHelper.readFile("example.json");
+    return findUser.users.find((item) => item.id === id);
   }
 
-  // Метод для получения индекса КОНКРЕТНОГО пользователся в массиве по id (объект со значением индекса)
-  getIndexUserByID(id) {
-    const findIndex = this.#userList.findIndex((item) => item.id === id);
+  // Метод для получения индекса КОНКРЕТНОГО пользователся в массиве по id: (объект со значением индекса)
+  async getIndexUserByID(id) {
+    const findUser = await FileHelper.readFile("example.json");
+    const findIndex = findUser.users.findIndex((item) => item.id === id);
     return { value: findIndex };
   }
 }

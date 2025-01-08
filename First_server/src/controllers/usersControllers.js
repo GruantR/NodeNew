@@ -1,77 +1,100 @@
-const e = require("express");
+const express = require("express");
 const UsersServices = require("../services/usersServices");
-const { v4: uuidv4 } = require('uuid'); // генератор id
+const { v4: uuidv4 } = require("uuid"); // генератор id
 
 class UsersControllers {
-  // Создание пользователь (create)
-  createUsers(req, res) {
-    const { id, username} = req.body;
-    //UsersServices.createUser(req.body);
+  // Создание пользователя: (create)
+  async createUsers(req, res) {
+    const { id, username } = req.body;
+    // Генерируем новый id:
     const newId = uuidv4();
-    UsersServices.createUser({id:newId,...req.body});
-    res.send(`Пользователь ${username} успешно создан, присвоен id: ${newId}`);
-  }
-
-  // Получение списка всех пользователей (read)
-  getUsers(req, res) {
-    const result = UsersServices.getUsers();
+    // Считываем содержимое файла:
+    const readFile = await UsersServices.getUsers();
+    // Добавляем нужный контент в файл:
+    readFile.users.push({ /*id:newId,*/ ...req.body });
+    // Перезаписываем файл:
+    const result = await UsersServices.createUser(readFile);
     res.send(result);
   }
 
-  // Получение информации о конкретном пользователе (read)
-  getUserByID(req, res) {
+  // Получение списка всех пользователей: (read)
+  async getUsers(req, res) {
+    const readFile = await UsersServices.getUsers();
+    const result = readFile.users;
+    res.send(result);
+  }
+
+  // Получение информации о конкретном пользователе: (read)
+  async getUserByID(req, res) {
     const targetId = req.params.id;
-    const result = UsersServices.getUserByID(targetId);
+    const result = await UsersServices.getUserByID(targetId);
     if (result) {
       res.json(result);
     } else {
-      res.status(404).send("Пользователь не найден");
+      res.status(404).send("В базе данных пользователь не найден!");
     }
   }
 
-  // Изменение конкретного пользователя (Update-PUT)
-  updateUserData(req, res) {
+  // Изменение конкретного пользователя: (Update-PUT)
+  async updateUserData(req, res) {
     const targetId = req.params.id;
-    const result = UsersServices.getUserByID(targetId);
-    if (result) {
-      const { username, email, password } = req.body;
-      result.username = username;
-      result.email = email;
-      result.password = password;
-
-      res.send(
-        `Данные пользоователя зарегистрированного под id:${result.id} обновлены`
+    const userList = await UsersServices.getUserByID(targetId);
+    if (userList) {
+      // если нужный нам пользователь существуем, считываем файл:
+      const readFile = await UsersServices.getUsers();
+      // находим индекс нужного нам пользователя (объекта) в массиве:
+      const objectIndexSearchElem = await UsersServices.getIndexUserByID(
+        targetId
       );
+      const { username, email, password } = req.body;
+      // обновляем выбранный объект новыми параметрами из body:
+      Object.assign(userList, { username, email, password });
+      // в считанном файле заменяем старый объект на обновленный:
+      readFile.users.splice(objectIndexSearchElem.value, 1, userList);
+      // перезаписываем файл:
+      await UsersServices.createUser(readFile);
+      res.send("Файл успешно обнолен");
     } else {
-      res.status(404).send("Пользователь не найден");
+      res.status(404).send("В базе данных пользователь не найден!");
     }
   }
 
-  //Изменение пароля конкретного пользователя (Update-PATCH)
-  updateUserPassword(req, res) {
+  //Изменение пароля конкретного пользователя: (Update-PATCH)
+  async updateUserPassword(req, res) {
     const targetId = req.params.id;
-    const result = UsersServices.getUserByID(targetId);
-    if (result) {
+    const userList = await UsersServices.getUserByID(targetId);
+    if (userList) {
+      // если нужный нам пользователь существуем, считываем файл:
+      const readFile = await UsersServices.getUsers();
+      // находим индекс нужного нам объекта в массиве:
+      const objectIndexSearchElem = await UsersServices.getIndexUserByID(
+        targetId
+      );
       const { password } = req.body;
-      result.password = password;
-
-      res.send(`Пароль пользователя под id:${result.id} обновлен`);
+      // обновляем выбранный объект новыми параметрами из body:
+      Object.assign(userList, { password });
+      // в считанном файле заменяем старый объект на обновленный:
+      readFile.users.splice(objectIndexSearchElem.value, 1, userList);
+      // перезаписываем файл:
+      await UsersServices.createUser(readFile);
+      res.send("Информация о выбранном пользователе успешно обновлена!");
     } else {
-      res.status(404).send("Пользователь не найден");
+      res.status(404).send("В базе данных пользователь не найден!");
     }
   }
 
-  // Удаление конкретного пользователя
-  deleteUser(req, res) {
+  // Удаление конкретного пользователя: (DELETE)
+  async deleteUser(req, res) {
     const targetId = req.params.id;
-    const indexTarget = UsersServices.getIndexUserByID(targetId)
-    const {value} = indexTarget; 
+    const indexTarget = await UsersServices.getIndexUserByID(targetId);
+    const { value } = indexTarget;
     if (value >= 0) {
-      const userList = UsersServices.getUsers();
-      userList.splice(value, 1);
-      res.send(`Пользователь удалён!`);
+      const readFile = await UsersServices.getUsers();
+      readFile.users.splice(value, 1);
+      await UsersServices.createUser(readFile);
+      res.send(`Выбранный пользователь удалён! - он не достоин!!!`);
     } else {
-      res.status(404).send("Пользователь не найден");
+      res.status(404).send("В базе данных пользователь не найден!");
     }
   }
 }
