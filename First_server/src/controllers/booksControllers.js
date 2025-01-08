@@ -1,0 +1,64 @@
+const express = require("express");
+const BooksServices = require("../services/booksServices");
+class booksControllers {
+  //Создание книги: (create)
+  async createBook(req, res) {
+    const { id, username } = req.body;
+    const readFile = await BooksServices.getBooks();
+    readFile.books.push({ /*id:newId,*/ ...req.body });
+    const result = await BooksServices.createBook(readFile);
+    res.send(result);
+  }
+
+  // Получение списка всех книг из базы данных: (read)
+  async getBooks(req, res) {
+    const readFile = await BooksServices.getBooks();
+    const result = readFile.books;
+    res.send(result);
+  }
+
+  // Получение информации о выбранной книге (read)
+  async getBookByID(req, res) {
+    const targetId = req.params.id;
+    const result = await BooksServices.getBookByID(targetId);
+    if (result) {
+      res.json(result);
+    } else {
+      res.status(404).send("В базе данных запрашиваемая книга не найдена");
+    }
+  }
+
+  // Изменение выбранной книги (Update-PUT)
+  async updateBook(req, res) {
+    const targetId = req.params.id;
+    const bookList = await BooksServices.getBookByID(targetId);
+    if (bookList) {
+      const readFile = await BooksServices.getBooks();
+      const objectIndexSearchElem = await BooksServices.getIndexBookByID(
+        targetId
+      );
+      const { bookname, author, page } = req.body;
+      Object.assign(bookList, { bookname, author, page });
+      readFile.books.splice(objectIndexSearchElem.value, 1, bookList);
+      await BooksServices.createBook(readFile);
+      res.send("Информация о выбранной книге успешно обновлена!");
+    } else {
+      res.status(404).send("В базе данных запрашиваемая книга не найдена");
+    }
+  }
+  async deleteBook(req, res) {
+    const targetId = req.params.id;
+    const indexTarget = await BooksServices.getIndexBookByID(targetId);
+    const { value } = indexTarget;
+    if (value >= 0) {
+      const readFile = await BooksServices.getBooks();
+      readFile.books.splice(value, 1);
+      await BooksServices.createBook(readFile);
+      res.send(`Книга удалена!`);
+    } else {
+      res.status(404).send("В базе данных запрашиваемая книга не найдена");
+    }
+  }
+}
+
+module.exports = new booksControllers();
