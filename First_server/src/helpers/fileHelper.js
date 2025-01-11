@@ -22,6 +22,19 @@ class FileHelper {
       });
     });
   }
+
+  checkFileExist(filePath) {
+    return new Promise ((res,rej)=>{
+      fs.access(filePath, fs.constants.F_OK, (err)=>{
+        if (err) {
+          rej(new Error('Файл не существует'))
+        }
+        else {
+          res('Всё норм, файл найден')
+        }
+      })
+    })
+  }
 }
 
 module.exports = new FileHelper();

@@ -40,16 +40,15 @@ class booksControllers {
       const { bookname, author, page } = req.body;
       Object.assign(bookList, { bookname, author, page });
       readFile.books.splice(objectIndexSearchElem.value, 1, bookList);
-      await BooksServices.createBook(readFile);
-      res.send("Информация о выбранной книге успешно обновлена!");
+      const result = await BooksServices.createBook(readFile);
+      res.send(result);
     } else {
       res.status(404).send("В базе данных запрашиваемая книга не найдена");
     }
   }
   async deleteBook(req, res) {
     const targetId = req.params.id;
-    const indexTarget = await BooksServices.getIndexBookByID(targetId);
-    const { value } = indexTarget;
+    const { value } = await BooksServices.getIndexBookByID(targetId);
     if (value >= 0) {
       const readFile = await BooksServices.getBooks();
       readFile.books.splice(value, 1);
