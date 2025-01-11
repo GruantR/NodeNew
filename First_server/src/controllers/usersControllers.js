@@ -86,8 +86,7 @@ class UsersControllers {
   // Удаление конкретного пользователя: (DELETE)
   async deleteUser(req, res) {
     const targetId = req.params.id;
-    const indexTarget = await UsersServices.getIndexUserByID(targetId);
-    const { value } = indexTarget;
+    const { value } = await UsersServices.getIndexUserByID(targetId);
     if (value >= 0) {
       const readFile = await UsersServices.getUsers();
       readFile.users.splice(value, 1);
