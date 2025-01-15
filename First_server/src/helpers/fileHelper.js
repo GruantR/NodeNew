@@ -27,7 +27,7 @@ class FileHelper {
     return new Promise ((res,rej)=>{
       fs.access(filePath, fs.constants.F_OK, (err)=>{
         if (err) {
-          rej(new Error('Файл не существует'))
+          rej(new Error('Файл не существует'))   
         }
         else {
           res('Всё норм, файл найден')
