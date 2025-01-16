@@ -1,10 +1,16 @@
 const express = require("express");
 const UsersServices = require("../services/usersServices");
 const { v4: uuidv4 } = require("uuid"); // генератор id
+const { validationResult } = require("express-validator");
 
 class UsersControllers {
   // Создание пользователя: (create)
   async createUsers(req, res) {
+    // Проверка ошибок валидации:
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
     const { id, username } = req.body;
     // Генерируем новый id:
     const newId = uuidv4();
