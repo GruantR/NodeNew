@@ -18,12 +18,6 @@ class booksControllers {
 
   // Получение списка всех книг из базы данных: (read)
   async getBooks(req, res) {
-
-    // const errors = validationResult(req);
-    // if (!errors.isEmpty()) {
-    //     return res.status(400).json({ errors: errors.array() });
-    // }
-
     const readFile = await BooksServices.getBooks();
     const result = readFile.books;
     res.send(result);
