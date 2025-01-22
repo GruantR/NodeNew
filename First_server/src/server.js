@@ -34,4 +34,9 @@ app.listen(PORT, () => {
 //     "author":"Stepan",
 //     "pages":"123"
 // }
+// Быстрый ввод todos
+// {
+//     "title": "GoToSleep",
+//     "isCompleted":"false"
+// }
 // тест

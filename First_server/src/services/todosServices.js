@@ -8,5 +8,13 @@ class TodosServices {
     const result = await FileHelper.readFile("example.json");
     return result;
   }
+  async createTodos(content) {
+    return await FileHelper.writeFile("example.json", content);
+  }
+    async getTodosByID(id) {
+      const readFile = await FileHelper.readFile("example.json");
+    return {searchIdTodos: readFile.todos.findIndex(item => item.idTask == id)};
+    }
+  
 }
 module.exports = new TodosServices();

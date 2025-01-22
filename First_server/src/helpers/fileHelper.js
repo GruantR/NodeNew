@@ -22,6 +22,7 @@ class FileHelper {
       });
     });
   }
+  
 
   writeFile(nameFile, result) {
     return new Promise((res, rej) => {

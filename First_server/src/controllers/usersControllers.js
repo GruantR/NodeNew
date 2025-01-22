@@ -60,7 +60,7 @@ class UsersControllers {
 
   // ПОЛУЧЕНИЕ (ЧТЕНИЕ) СПИСКА ВСЕХ ПОЛЬЗОВАТЕЛЕЙ: (READ)
   async getUsers(req, res) {
-   console.log("vfvfvf: ",req.userIdd);
+   console.log("vfvfvf: ",req.idUser);
     
     const readFile = await UsersServices.getUsers();
     const result = readFile.users;

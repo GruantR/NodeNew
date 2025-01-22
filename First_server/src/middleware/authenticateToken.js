@@ -10,7 +10,7 @@ const authenticateToken = (req,res,next) => {
     console.log(data);
     
             if (err) next (new Error('invalid token'))
-                req.userIdd = data.userId
+                req.idUser = data.userId
                 next()
     })
     }
