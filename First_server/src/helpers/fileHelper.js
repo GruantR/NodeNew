@@ -11,6 +11,18 @@ class FileHelper {
       });
     });
   }
+  readFileByEmail(nameFile,email) {
+    return new Promise((res, rej) => {
+      fs.readFile(nameFile, "utf8", (err, data) => {
+        if (err) {
+          console.error(err);
+          rej(err);
+        }
+        res(JSON.parse(data).users.find(item => item.email === email));
+      });
+    });
+  }
+
   writeFile(nameFile, result) {
     return new Promise((res, rej) => {
       fs.writeFile(nameFile, JSON.stringify(result), (err) => {
@@ -18,7 +30,7 @@ class FileHelper {
           console.error(err);
           rej(err);
         }
-        res("Файл успешно записан.");
+        res("Внесена запись в базу данных.");
       });
     });
   }

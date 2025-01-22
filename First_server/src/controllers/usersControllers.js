@@ -1,33 +1,70 @@
 const express = require("express");
+const bcrypt = require("bcrypt");
 const UsersServices = require("../services/usersServices");
 const { v4: uuidv4 } = require("uuid"); // генератор id
 const { validationResult } = require("express-validator");
+const jwt = require("jsonwebtoken");
 
 class UsersControllers {
-  // Создание пользователя: (create)
+  // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ: (CREATE)
   async createUsers(req, res) {
     // Проверка ошибок валидации:
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const { id, username } = req.body;
-    // Генерируем новый id:
-    const newId = uuidv4();
+    // Хешируем пароль от плохих дядек:
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
     // Считываем содержимое файла:
     const readFile = await UsersServices.getUsers();
-    // Добавляем нужный контент в файл:
-    readFile.users.push({ /*id:newId,*/ ...req.body });
+    // Проверка наличия email в базе:
+    const findEmailByBase = readFile.users.find(item => item.email === req.body.email);
+    if (findEmailByBase) {
+      res.status(404).send("Ошибка, пользователь с таким email УЖО существует");
+    }
+    else {
+    // Добавляем нужный контент в файл и генерируем новый id:
+    readFile.users.push({ id: uuidv4(), ...req.body, password: hashedPassword });
     // Перезаписываем файл:
     const result = await UsersServices.createUser(readFile);
-    res.send(result);
+    res.send(result); 
+    }
+
   }
 
-  // Получение списка всех пользователей: (read)
+  // ЛОГИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ:
+   async loginUser (req,res) {
+        // Проверка ошибок валидации:
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+          return res.status(400).json({ errors: errors.array() });
+        }
+        //
+        const {email,password} = req.body;        
+        // Проверка наличия email
+        const user = await UsersServices.getUserByEmail(email);
+        if (!user) {
+          return res.status(401).json({message: "Неверный email или пароль"})
+        }
+        // проверка наличия пароля
+        const isPasswordValid = await bcrypt.compare(password, user.password)
+        if (!isPasswordValid) {
+          return res.status(401).json({message: "Неверный email или пароль"})
+        }
+        // Создание JWT-токена:
+        const token = jwt.sign({userId: user.id}, process.env.SECRET_KEY, {})
+        res.send({token})
+
+   }
+
+  // ПОЛУЧЕНИЕ (ЧТЕНИЕ) СПИСКА ВСЕХ ПОЛЬЗОВАТЕЛЕЙ: (READ)
   async getUsers(req, res) {
+   console.log("vfvfvf: ",req.userIdd);
+    
     const readFile = await UsersServices.getUsers();
     const result = readFile.users;
-    res.send(result);
+    res.send(result)
   }
 
   // Получение информации о конкретном пользователе: (read)
