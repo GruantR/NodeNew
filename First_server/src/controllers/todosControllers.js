@@ -47,6 +47,27 @@ class TodosControllers {
     const result = await TodosServices.createTodos(readFile);
     res.send(result);
   }
+  async patchIsCompletedTodos(req,res) {
+    const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
+    if (findIndexTodos.searchIdTodos < 0) {
+        return res.status(401).json({message: "Такой такси не существует бро!"})
+    }
+    const readFile = await TodosServices.getTodos();
+    const todo =  readFile.todos[findIndexTodos.searchIdTodos];
+    todo.isCompleted = !todo.isCompleted;
+    await TodosServices.createTodos(readFile);
+    res.send("Статус задания изменён!");
+  }
+  async deleteTodosByID(req,res){
+    const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
+    if (findIndexTodos.searchIdTodos < 0) {
+        return res.status(401).json({message: "Такой такси не существует бро!"})
+    }
+    const readFile = await TodosServices.getTodos();
+    readFile.todos.splice(findIndexTodos.searchIdTodos,1)
+    await TodosServices.createTodos(readFile);
+    res.send('Таска удалена!')
+  }
 
 }
 module.exports = new TodosControllers();
