@@ -5,5 +5,7 @@ const TodosControllers = require("../controllers/todosControllers");
 const TodosRoutesValidation = require("./todosRoutesValidation")
 const authenticateToken = require("../middleware/authenticateToken")
 router.get("/",authenticateToken, TodosControllers.getTodosSpecificUser);
-router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(),TodosControllers.createTodos)
-router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), TodosControllers.patchTitleTodos)
+router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(),TodosControllers.createTodos);
+router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), TodosControllers.patchTitleTodos);
+router.patch("/:id/isCompleted", authenticateToken, TodosControllers.patchIsCompletedTodos);
+router.delete("/:id",authenticateToken,TodosControllers.deleteTodosByID)
