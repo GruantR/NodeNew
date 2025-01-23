@@ -9,6 +9,12 @@ class TodosControllers {
     const result = readFile.todos;
     res.send(result);
   }
+  async getTodosSpecificUser(req, res) {  
+    const readFile = await TodosServices.getTodosSpecificUser(req.idUser);
+    res.send(readFile)
+    
+  }
+
 
   async createTodos(req, res) {
     const errors = validationResult(req);
@@ -16,11 +22,11 @@ class TodosControllers {
       return res.status(400).json({ errors: errors.array() });
     }
     const readFile = await TodosServices.getTodos();
-    const findTitleByBase = readFile.todos.find(
+    const findTitleByBase = readFile.todos.filter(item => item.idUser === req.idUser).find(
       (item) => item.title === req.body.title
     );
     if (findTitleByBase) {
-      res.status(404).send("Ошибка, такое задание УЖО существует");
+    return res.status(404).send("Ошибка, такое задание УЖО существует");
     }
     readFile.todos.push({ idTask: uuidv4(), ...req.body, idUser: req.idUser });
     const result = await TodosServices.createTodos(readFile);
