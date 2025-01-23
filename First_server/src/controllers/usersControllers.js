@@ -6,7 +6,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 
 class UsersControllers {
-  // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ: (CREATE)
+  // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
   async createUsers(req, res) {
     // Проверка ошибок валидации:
     const errors = validationResult(req);
@@ -60,7 +60,7 @@ class UsersControllers {
 
   // ПОЛУЧЕНИЕ (ЧТЕНИЕ) СПИСКА ВСЕХ ПОЛЬЗОВАТЕЛЕЙ: (READ)
   async getUsers(req, res) {
-   console.log("vfvfvf: ",req.idUser);
+   //console.log("vfvfvf: ", req.idUser);
     
     const readFile = await UsersServices.getUsers();
     const result = readFile.users;
