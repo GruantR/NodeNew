@@ -91,7 +91,9 @@ class UsersControllers {
       );
       const { username, email, password } = req.body;
       // обновляем выбранный объект новыми параметрами из body:
-      Object.assign(userList, { username, email, password });
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+      Object.assign(userList, { username, email, password: hashedPassword });
       // в считанном файле заменяем старый объект на обновленный:
       readFile.users.splice(objectIndexSearchElem.value, 1, userList);
       // перезаписываем файл:
@@ -113,7 +115,8 @@ class UsersControllers {
       const objectIndexSearchElem = await UsersServices.getIndexUserByID(
         targetId
       );
-      const { password } = req.body;
+      const saltRounds = 10;
+      const password = await bcrypt.hash(req.body.password, saltRounds);
       // обновляем выбранный объект новыми параметрами из body:
       Object.assign(userList, { password });
       // в считанном файле заменяем старый объект на обновленный:

@@ -1,6 +1,9 @@
 const express = require("express");
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('../swaggerSpec.js'); 
 const app = express();
 require("dotenv").config();
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 const router = require("./routes");
 
 // Middleware для Логирования
