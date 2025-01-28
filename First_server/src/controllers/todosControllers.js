@@ -35,7 +35,7 @@ class TodosControllers {
   async patchTitleTodos (req, res) {    
     const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
     if (findIndexTodos.searchIdTodos < 0) {
-        return res.status(401).json({message: "Такой такси не существует бро!"})
+        return res.status(401).json({message: "В базе нет задания с таким ID"})
     }
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -50,7 +50,7 @@ class TodosControllers {
   async patchIsCompletedTodos(req,res) {
     const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
     if (findIndexTodos.searchIdTodos < 0) {
-        return res.status(401).json({message: "Такой такси не существует бро!"})
+        return res.status(404).json({message: "Таска с указанным идентификатором не найдена"})
     }
     const readFile = await TodosServices.getTodos();
     const todo =  readFile.todos[findIndexTodos.searchIdTodos];
@@ -61,7 +61,7 @@ class TodosControllers {
   async deleteTodosByID(req,res){
     const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
     if (findIndexTodos.searchIdTodos < 0) {
-        return res.status(401).json({message: "Такой такси не существует бро!"})
+        return res.status(404).json({message: "Таска с указанным идентификатором не найдена"})
     }
     const readFile = await TodosServices.getTodos();
     readFile.todos.splice(findIndexTodos.searchIdTodos,1)
