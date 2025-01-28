@@ -66,23 +66,6 @@ router.get("/",authenticateToken, TodosControllers.getTodosSpecificUser);
  *                 type: boolean
  *                 example: false
  *                 description: Отметка о выполнении
-
- *     UserLogin:
- *       description: Шаблон-схема для логирования
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 example: example@gmail.com
- *                 description: Почта пользователя
- *               password:
- *                 type: string
- *                 example: 123123
- *                 description: Пароль пользователя
  * 
  * 
  */
