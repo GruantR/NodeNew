@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { body, param, header } = require("express-validator");
 const booksControllers = require("../controllers/booksControllers");
-const booksRoutesValidation = require('./booksRoutesValidation')
+const booksRoutesValidation = require('../helpers/booksRoutesValidation')
 
 const validateDataCreateBook = [
   body("bookname")
