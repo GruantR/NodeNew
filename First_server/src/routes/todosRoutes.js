@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 module.exports = router
 const TodosControllers = require("../controllers/todosControllers");
-const TodosRoutesValidation = require("./todosRoutesValidation")
+const TodosRoutesValidation = require("../helpers/todosRoutesValidation")
 const authenticateToken = require("../middleware/authenticateToken")
 /**
  * @swagger
