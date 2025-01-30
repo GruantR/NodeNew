@@ -4,10 +4,12 @@ const UsersServices = require("../services/usersServices");
 const { v4: uuidv4 } = require("uuid"); // генератор id
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
+const Sentry = require("@sentry/node");
 
 class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
   async createUsers(req, res) {
+    try{
     // Проверка ошибок валидации:
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -30,7 +32,18 @@ class UsersControllers {
     const result = await UsersServices.createUser(readFile);
     res.send(result); 
     }
+  }catch (error) {
+    // Логируем ошибку в Sentry
+    Sentry.captureException(error);
+    
+    // Возвращаем ошибку пользователю
+    return res.status(500).json({ message: "Произошла ошибка при входе в систему" });
+  }
 
+  app.get("/debug-sentry", function mainHandler(req, res) {
+    throw new Error("My first Sentry error!");
+  });
+  
   }
 
   // ЛОГИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ:
@@ -71,9 +84,13 @@ class UsersControllers {
   async getUserByID(req, res) {
     const targetId = req.params.id;
     const result = await UsersServices.getUserByID(targetId);
+    try {
+      // Твой код, который может вызвать ошибку
+    } catch (error) {
+      Sentry.captureException(error);
+    }
     if (result) {
       res.json(result);
-    } else {
       res.status(404).send("В базе данных пользователь не найден!");
     }
   }
