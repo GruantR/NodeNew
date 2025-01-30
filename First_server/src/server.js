@@ -11,7 +11,6 @@ Sentry.init({
   dsn: "https://80704a0f84379958518ea4546dc6a291@o4508728311087104.ingest.de.sentry.io/4508733683138640",
   // Другие опции настройки
 });
-Sentry.setupExpressErrorHandler(app);
 
 // Middleware для Логирования
 function logger(req, res, next) {

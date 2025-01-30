@@ -1,1 +1,51 @@
-{"users":[{"id":"0cacefa4-131f-438e-ba17-1cadde4071fe","username":"Rysya","email":"ruslanusrulit@gmail.com","password":"$2b$10$WJnQZ6m5JQuEjJY3Tl/fHO2bEG/.0DGhRLAan3FyVJitPhZPCfA5e"},{"id":"81bd3b78-b69f-4870-8d30-dbe659819d56","username":"username1","email":"example@gmail1.com","password":"$2b$10$ilK3kdbQFLUFVWIbrEK8mubgKcKa496/bwp0aaxsdtJo5YDPms2W2"}],"books":[{"id":"1","bookname":"Masha i medvdddddddded","author":"Stepan","pages":"123"},{"id":"2","bookname":"с","author":"Stepan","pages":"123"}],"todos":[{"idTask":"426f95b7-dc06-47a7-bbc1-41a24ddaf131","title":"GotoSleepUser2","isCompleted":false,"idUser":"2c46d8fb-f08f-4cef-8b64-7d299501580f"},{"idTask":"b765b1a6-e019-4dd3-854b-f9661dd5c0fd","title":"GotoSleepUser2-2","isCompleted":false,"idUser":"2c46d8fb-f08f-4cef-8b64-7d299501580f"},{"idTask":"cd918a48-1f9d-4e03-802b-44f2f7802177","title":"fefefe","isCompleted":false,"idUser":"0cacefa4-131f-438e-ba17-1cadde4071fe"},{"idTask":"ac5502d7-f7e4-4c3d-9289-3e17d1617409","title":"fefvfvfvfefe","isCompleted":false,"idUser":"0cacefa4-131f-438e-ba17-1cadde4071fe"}]}
+{
+  "users": [
+    {
+      "id": "0cacefa4-131f-438e-ba17-1cadde4071fe",
+      "username": "Rysya",
+      "email": "ruslanusrulit@gmail.com",
+      "password": "$2b$10$WJnQZ6m5JQuEjJY3Tl/fHO2bEG/.0DGhRLAan3FyVJitPhZPCfA5e"
+    },
+    {
+      "id": "81bd3b78-b69f-4870-8d30-dbe659819d56",
+      "username": "username1",
+      "email": "example@gmail1.com",
+      "password": "$2b$10$ilK3kdbQFLUFVWIbrEK8mubgKcKa496/bwp0aaxsdtJo5YDPms2W2"
+    }
+  ],
+  "books": [
+    {
+      "id": "1",
+      "bookname": "Masha i medvdddddddded",
+      "author": "Stepan",
+      "pages": "123"
+    },
+    { "id": "2", "bookname": "с", "author": "Stepan", "pages": "123" }
+  ],
+  "todos": [
+    {
+      "idTask": "426f95b7-dc06-47a7-bbc1-41a24ddaf131",
+      "title": "GotoSleepUser2",
+      "isCompleted": false,
+      "idUser": "2c46d8fb-f08f-4cef-8b64-7d299501580f"
+    },
+    {
+      "idTask": "b765b1a6-e019-4dd3-854b-f9661dd5c0fd",
+      "title": "GotoSleepUser2-2",
+      "isCompleted": false,
+      "idUser": "2c46d8fb-f08f-4cef-8b64-7d299501580f"
+    },
+    {
+      "idTask": "cd918a48-1f9d-4e03-802b-44f2f7802177",
+      "title": "fefefe",
+      "isCompleted": false,
+      "idUser": "0cacefa4-131f-438e-ba17-1cadde4071fe"
+    },
+    {
+      "idTask": "ac5502d7-f7e4-4c3d-9289-3e17d1617409",
+      "title": "fefvfvfvfefe",
+      "isCompleted": false,
+      "idUser": "0cacefa4-131f-438e-ba17-1cadde4071fe"
+    }
+  ]
+}
