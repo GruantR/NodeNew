@@ -25,7 +25,7 @@ class UsersControllers {
         (item) => item.email === req.body.email
       );
       if (findEmailByBase) {
-       return res
+        return res
           .status(409)
           .send("Ошибка, пользователь с таким email УЖО существует");
       } else {
@@ -77,15 +77,15 @@ class UsersControllers {
       Sentry.captureException(error, {
         // Теги для фильтрации в Sentry (например, "controller: users")
         tags: { controller: "UsersControllers" },
-        
+
         // Дополнительные данные
         extra: {
           endpoint: req.path, // Например, "/api/login"
           body: req.body, // Что передал пользователь (email/password)
-          userId: user?.id // Если user существует
-        }
+          userId: user?.id, // Если user существует
+        },
       });
-      
+
       return res.status(500).json({ message: "Ошибка авторизации" });
     }
   }
@@ -109,8 +109,8 @@ class UsersControllers {
       const targetId = req.params.id;
       const result = await UsersServices.getUserByID(targetId);
 
- // Искусственная ошибка для теста Sentry 
- //throw new Error("Тестовая ошибка для Sentry: пользователь не найден!");
+      // Искусственная ошибка для теста Sentry
+      throw new Error("Тестовая ошибка для Sentry: пользователь не найден!");
 
       if (result) {
         res.json(result);
@@ -118,10 +118,10 @@ class UsersControllers {
       }
     } catch (error) {
       Sentry.captureException(error, {
-        extra: { 
-          targetId: req.params.id, 
-          timestamp: new Date().toISOString() 
-        }
+        extra: {
+          targetId: req.params.id,
+          timestamp: new Date().toISOString(),
+        },
       });
       res.status(500).json({ message: "Ошибка поиска пользователя" });
     }
