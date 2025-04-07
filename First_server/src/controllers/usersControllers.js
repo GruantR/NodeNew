@@ -208,4 +208,14 @@ class UsersControllers {
   }
 }
 
-module.exports = new UsersControllers();
+
+function sum(a, b) {
+  return a + b;
+}
+// module.exports = sum;
+
+// module.exports = new UsersControllers();
+module.exports = {
+  sum,
+  UsersControllers: new UsersControllers(),
+}; 
