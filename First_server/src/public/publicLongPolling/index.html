@@ -1,0 +1,52 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Long Polling Chat</title>
+</head>
+<body>
+    <h1>Чат с Long Polling</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Введите сообщение..." />
+    <button onclick="sendMessage()">Отправить</button>
+
+    <script>
+        function fetchMessages() {
+            fetch('/messages')
+                .then(response => response.json())
+                .then(data => {
+                    const messagesDiv = document.getElementById('messages');
+                    messagesDiv.innerHTML = ''; // Очистка предыдущих сообщений
+                    data.forEach(msg => {
+                        const messageElement = document.createElement('div');
+                        messageElement.textContent = msg;
+                        messagesDiv.appendChild(messageElement);
+                    });
+                    // Запуск снова
+                    fetchMessages();
+                });
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            if (message) {
+                // Отправка сообщения на сервер
+                fetch('/messages', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ message })
+                });
+                messageInput.value = ''; // Очистка поля ввода
+            }
+        }
+
+        // Запуск функции получения сообщений
+        fetchMessages();
+    </script>
+</body>
+</html>

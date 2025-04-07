@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WebSocket Chat</title>
+  <style>
+    /* Стили для формы авторизации */
+    .auth-box { 
+      margin: 50px auto; 
+      width: 300px; 
+    }
+    
+    /* Стили для основного интерфейса чата */
+    .chat-box { 
+      display: none; /* Изначально скрыт */
+    }
+    
+    /* Стили для списка сообщений */
+    #messages { 
+      list-style: none; 
+      padding: 0; 
+    }
+    
+    /* Стили для отдельного сообщения */
+    .message-item { 
+      background: #f0f0f0; 
+      padding: 10px; 
+      margin: 5px 0; 
+      border-radius: 5px; 
+    }
+    
+    /* Стили для имени пользователя в сообщении */
+    .message-user { 
+      font-weight: bold; 
+      color: #2c3e50; 
+    }
+    
+    /* Стили для времени сообщения */
+    .message-time { 
+      font-size: 0.8em; 
+      color: #7f8c8d; 
+    }
+    
+    /* Стили для системных сообщений */
+    .system-message { 
+      color: #e74c3c; 
+      font-style: italic; 
+    }
+  </style>
+</head>
+<body>
+  <!-- Блок авторизации -->
+  <div class="auth-box">
+    <h2>Выберите никнейм</h2>
+    <input type="text" id="usernameInput" placeholder="Ваш никнейм">
+    <button onclick="setUsername()">Продолжить</button>
+    <div id="authError" class="system-message"></div>
+  </div>
+
+  <!-- Основной интерфейс чата -->
+  <div class="chat-box">
+    <h2>Чат: <span id="currentUser"></span></h2>
+    <ul id="messages"></ul>
+    <input type="text" id="messageInput" placeholder="Ваше сообщение">
+    <button onclick="sendMessage()">Отправить</button>
+  </div>
+
+  <!-- Подключение Socket.io -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Подключение к серверу
+    const socket = io();
+    let currentUsername = '';
+
+    // Функция установки никнейма
+    function setUsername() {
+      const username = document.getElementById('usernameInput').value.trim();
+      if (!username) {
+        showAuthError('Введите никнейм');
+        return;
+      }
+      // Отправка никнейма на сервер
+      socket.emit('set_username', username);
+    }
+
+    // Функция отправки сообщения
+    function sendMessage() {
+      const message = document.getElementById('messageInput').value.trim();
+      if (message) {
+        socket.emit('message', message);
+        document.getElementById('messageInput').value = '';
+      }
+    }
+
+    // Обработчики событий от сервера:
+    
+    // Успешная установка никнейма
+    socket.on('username_accepted', () => {
+      currentUsername = document.getElementById('usernameInput').value.trim();
+      document.querySelector('.auth-box').style.display = 'none';
+      document.querySelector('.chat-box').style.display = 'block';
+      document.getElementById('currentUser').textContent = currentUsername;
+    });
+
+    // Ошибка авторизации
+    socket.on('error', (error) => {
+      showAuthError(error);
+    });
+
+    // Новый пользователь подключился
+    socket.on('user_connected', (username) => {
+      addSystemMessage(`Пользователь ${username} подключился`);
+    });
+
+    // Пользователь отключился
+    socket.on('user_disconnected', (username) => {
+      addSystemMessage(`Пользователь ${username} покинул чат`);
+    });
+
+    // Новое сообщение в чате
+    socket.on('message', (data) => {
+      const li = document.createElement('li');
+      li.className = 'message-item';
+      li.innerHTML = `
+        <span class="message-user">${data.user}</span>
+        <span class="message-time">${data.time}</span><br>
+        ${data.text}
+      `;
+      document.getElementById('messages').appendChild(li);
+    });
+
+    // Вспомогательные функции
+    
+    // Показать ошибку авторизации
+    function showAuthError(message) {
+      document.getElementById('authError').textContent = message;
+    }
+
+    // Добавить системное сообщение
+    function addSystemMessage(message) {
+      const li = document.createElement('li');
+      li.className = 'system-message';
+      li.textContent = message;
+      document.getElementById('messages').appendChild(li);
+    }
+  </script>
+</body>
+</html>
