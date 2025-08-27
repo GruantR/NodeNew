@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid"); // генератор id
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node");
+const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 
 class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
@@ -18,27 +19,15 @@ class UsersControllers {
       // Хешируем пароль от плохих дядек:
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-      // Считываем содержимое файла:
-      const readFile = await UsersServices.getUsers();
-      // Проверка наличия email в базе:
-      const findEmailByBase = readFile.users.find(
-        (item) => item.email === req.body.email
-      );
-      if (findEmailByBase) {
-        return res
-          .status(409)
-          .send("Ошибка, пользователь с таким email УЖО существует");
-      } else {
-        // Добавляем нужный контент в файл и генерируем новый id:
-        readFile.users.push({
-          id: uuidv4(),
-          ...req.body,
-          password: hashedPassword,
-        });
-        // Перезаписываем файл:
-        const result = await UsersServices.createUser(readFile);
-        res.send(result);
+
+      const newUser = {
+        id: uuidv4(),
+        ...req.body,
+        password: hashedPassword,
       }
+      const result = await UsersServices.createUser(newUser);
+      res.send(result);
+
     } catch (error) {
       // Логируем ошибку в Sentry
       Sentry.captureException(error);
@@ -49,6 +38,53 @@ class UsersControllers {
         .json({ message: "Произошла ошибка при регистрации" });
     }
   }
+
+
+  // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+  // async createUsers(req, res) {
+  //   try {
+  //     // Проверка ошибок валидации:
+  //     const errors = validationResult(req);
+  //     if (!errors.isEmpty()) {
+  //       return res.status(400).json({ errors: errors.array() });
+  //     }
+  //     // Хешируем пароль от плохих дядек:
+  //     const saltRounds = 10;
+  //     const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+  //     // Считываем содержимое файла:
+  //     const readFile = await UsersServices.getUsers();
+  //     // Проверка наличия email в базе:
+  //     const findEmailByBase = readFile.users.find(
+  //       (item) => item.email === req.body.email
+  //     );
+  //     if (findEmailByBase) {
+  //       return res
+  //         .status(409)
+  //         .send("Ошибка, пользователь с таким email УЖО существует");
+  //     } else {
+  //       // Добавляем нужный контент в файл и генерируем новый id:
+  //       readFile.users.push({
+  //         id: uuidv4(),
+  //         ...req.body,
+  //         password: hashedPassword,
+  //       });
+  //       // Перезаписываем файл:
+  //       const result = await UsersServices.createUser(readFile);
+  //       res.send(result);
+  //     }
+  //   } catch (error) {
+  //     // Логируем ошибку в Sentry
+  //     Sentry.captureException(error);
+
+  //     // Возвращаем ошибку пользователю
+  //     return res
+  //       .status(500)
+  //       .json({ message: "Произошла ошибка при регистрации" });
+  //   }
+  // }
+
+
+
 
   // ЛОГИРОВАНИЕ ПОЛЬЗОВАТЕЛЯ:
   async loginUser(req, res) {
@@ -90,18 +126,42 @@ class UsersControllers {
     }
   }
 
+
+
+
+
+
+
   // ПОЛУЧЕНИЕ (ЧТЕНИЕ) СПИСКА ВСЕХ ПОЛЬЗОВАТЕЛЕЙ: (READ)
+
   async getUsers(req, res) {
     try {
-      //console.log("vfvfvf: ", req.idUser);
-      const readFile = await UsersServices.getUsers();
-      const result = readFile.users;
+      const result = await UsersServices.getUsers();
       res.send(result);
     } catch (error) {
       Sentry.captureException(error);
       res.status(500).json({ message: "Ошибка получения пользователей" });
     }
   }
+
+
+// ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+  // async getUsers(req, res) {
+  //   try {
+  //     //console.log("vfvfvf: ", req.idUser);
+  //     const readFile = await UsersServices.getUsers();
+  //     const result = readFile.users;
+  //     res.send(result);
+  //   } catch (error) {
+  //     Sentry.captureException(error);
+  //     res.status(500).json({ message: "Ошибка получения пользователей" });
+  //   }
+  // }
+
+
+
+
+
 
   // Получение информации о конкретном пользователе: (read)
   async getUserByID(req, res) {
