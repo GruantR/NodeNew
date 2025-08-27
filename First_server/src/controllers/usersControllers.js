@@ -110,7 +110,7 @@ class UsersControllers {
       const result = await UsersServices.getUserByID(targetId);
 
       // Искусственная ошибка для теста Sentry
-      throw new Error("Тестовая ошибка для Sentry: пользователь не найден!");
+     // throw new Error("Тестовая ошибка для Sentry: пользователь не найден!");
 
       if (result) {
         res.json(result);
@@ -128,35 +128,70 @@ class UsersControllers {
   }
 
   // Изменение конкретного пользователя: (Update-PUT)
-  async updateUserData(req, res) {
-    try {
-      const targetId = req.params.id;
-      const userList = await UsersServices.getUserByID(targetId);
-      if (userList) {
-        // если нужный нам пользователь существуем, считываем файл:
-        const readFile = await UsersServices.getUsers();
-        // находим индекс нужного нам пользователя (объекта) в массиве:
-        const objectIndexSearchElem = await UsersServices.getIndexUserByID(
-          targetId
-        );
-        const { username, email, password } = req.body;
-        // обновляем выбранный объект новыми параметрами из body:
-        const saltRounds = 10;
-        const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
-        Object.assign(userList, { username, email, password: hashedPassword });
-        // в считанном файле заменяем старый объект на обновленный:
-        readFile.users.splice(objectIndexSearchElem.value, 1, userList);
-        // перезаписываем файл:
-        await UsersServices.createUser(readFile);
-        res.send("Файл успешно обнолен");
-      } else {
-        res.status(404).send("В базе данных пользователь не найден!");
-      }
-    } catch (error) {
-      Sentry.captureException(error);
-      res.status(500).json({ message: "Ошибка обновления данных" });
+async updateUserData(req, res) {
+  try {
+    const targetId = req.params.id;
+    const userList = await UsersServices.getUserByID(targetId);
+    
+    if (!userList) {
+      return res.status(404).send("В базе данных пользователь не найден!");
     }
+
+    const readFile = await UsersServices.getUsers();
+    const objectIndexSearchElem = await UsersServices.getIndexUserByID(targetId);
+    
+    // Обновляем только переданные поля
+    if (req.body.username) userList.username = req.body.username;
+    if (req.body.email) userList.email = req.body.email;
+    
+    if (req.body.password) {
+      const saltRounds = 10;
+      userList.password = await bcrypt.hash(req.body.password, saltRounds);
+    }
+
+    readFile.users.splice(objectIndexSearchElem.value, 1, userList);
+    await UsersServices.createUser(readFile);
+    
+    res.send("Данные пользователя успешно обновлены");
+  } catch (error) {
+    Sentry.captureException(error);
+    res.status(500).json({ message: "Ошибка обновления данных" });
   }
+}
+
+
+
+async updateUserData(req, res) {
+  try {
+    const targetId = req.params.id;
+    const userList = await UsersServices.getUserByID(targetId);
+    
+    if (!userList) {
+      return res.status(404).send("В базе данных пользователь не найден!");
+    }
+
+    const readFile = await UsersServices.getUsers();
+    const objectIndexSearchElem = await UsersServices.getIndexUserByID(targetId);
+    
+    // Обновляем только переданные поля
+    if (req.body.username) userList.username = req.body.username;
+    if (req.body.email) userList.email = req.body.email;
+    
+    if (req.body.password) {
+      const saltRounds = 10;
+      userList.password = await bcrypt.hash(req.body.password, saltRounds);
+    }
+
+    readFile.users.splice(objectIndexSearchElem.value, 1, userList);
+    await UsersServices.createUser(readFile);
+    
+    res.send("Данные пользователя успешно обновлены");
+  } catch (error) {
+    Sentry.captureException(error);
+    res.status(500).json({ message: "Ошибка обновления данных" });
+  }
+}
+
 
   //Изменение пароля конкретного пользователя: (Update-PATCH)
   async updateUserPassword(req, res) {
