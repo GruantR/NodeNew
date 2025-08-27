@@ -4,24 +4,47 @@ const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 class UsersServices {
     #COLLECTION = "users";
 
-  // Метод добавления (записи) новых пользователей:
-  // async createUser(content) {
-  //    return await FileHelper.writeFile("example.json", content);
-  //   }
-
+  
+  
+    // Метод добавления (записи) новых пользователей:
   async createUser(info) {
     const connection = await getConnection();
     const db = useDefaultDb(connection);
     await db.collection(this.#COLLECTION).insertOne(info);
     connection.close();
+    return info
   }
+
+    // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+    // async createUser(content) {
+    //    return await FileHelper.writeFile("example.json", content);
+    //   }
+
+
+
 
 
   // Метод для получения (чтения) списка ВСЕХ пользователей: (массив объектов)
   async getUsers() {
-    const result = await FileHelper.readFile("example.json");
-    return result;
+    const connection = await getConnection()
+    const db = useDefaultDb (connection)
+    const data = await db.collection(this.#COLLECTION).find({}).toArray()
+    //console.log(data)
+    connection.close()
+    return data
   }
+  // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+  // async getUsers() {
+  //   const result = await FileHelper.readFile("example.json");
+  //   return result;
+  // }
+
+
+
+
+
+
+
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по ID: (объект)
   async getUserByID(id) {
