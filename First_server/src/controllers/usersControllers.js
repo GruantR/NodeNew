@@ -11,22 +11,24 @@ class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
   async createUsers(req, res) {
     try {
-      // Проверка ошибок валидации:
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+      // Проверка валидации осуществляется в роутах
+
       // Хешируем пароль от плохих дядек:
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
       const newUser = {
-        id: uuidv4(),
+       // id: uuidv4(), это был id для работы в текстовом редакторе
         ...req.body,
         password: hashedPassword,
       }
-      const result = await UsersServices.createUser(newUser);
-      res.send(result);
+      await UsersServices.createUser(newUser);
+      
+      // Отправляем успешное сообщение
+      res.status(201).json({ 
+        message: "Пользователь успешно зарегистрирован",
+        'Присвоен следующий id: ': newUser._id
+      });
 
     } catch (error) {
       // Логируем ошибку в Sentry
@@ -38,8 +40,6 @@ class UsersControllers {
         .json({ message: "Произошла ошибка при регистрации" });
     }
   }
-
-
   // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
   // async createUsers(req, res) {
   //   try {
@@ -143,8 +143,6 @@ class UsersControllers {
       res.status(500).json({ message: "Ошибка получения пользователей" });
     }
   }
-
-
 // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
   // async getUsers(req, res) {
   //   try {
@@ -168,13 +166,11 @@ class UsersControllers {
     try {
       const targetId = req.params.id;
       const result = await UsersServices.getUserByID(targetId);
-
-      // Искусственная ошибка для теста Sentry
-     // throw new Error("Тестовая ошибка для Sentry: пользователь не найден!");
-
       if (result) {
         res.json(result);
-        return res.status(404).send("В базе данных пользователь не найден!");
+      }
+      else {
+        res.status(404).send("В базе данных пользователь не найден!");
       }
     } catch (error) {
       Sentry.captureException(error, {
@@ -186,6 +182,36 @@ class UsersControllers {
       res.status(500).json({ message: "Ошибка поиска пользователя" });
     }
   }
+  // // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+  // async getUserByID(req, res) {
+  //   try {
+  //     const targetId = req.params.id;
+  //     const result = await UsersServices.getUserByID(targetId);
+
+ 
+  //     if (result) {
+  //       res.json(result);
+  //       return res.status(404).send("В базе данных пользователь не найден!");
+  //     }
+  //   } catch (error) {
+  //     Sentry.captureException(error, {
+  //       extra: {
+  //         targetId: req.params.id,
+  //         timestamp: new Date().toISOString(),
+  //       },
+  //     });
+  //     res.status(500).json({ message: "Ошибка поиска пользователя" });
+  //   }
+  // }
+
+
+
+
+
+
+
+
+
 
   // Изменение конкретного пользователя: (Update-PUT)
 async updateUserData(req, res) {
@@ -197,60 +223,54 @@ async updateUserData(req, res) {
       return res.status(404).send("В базе данных пользователь не найден!");
     }
 
-    const readFile = await UsersServices.getUsers();
-    const objectIndexSearchElem = await UsersServices.getIndexUserByID(targetId);
     
+    const updateFiles = {}
     // Обновляем только переданные поля
-    if (req.body.username) userList.username = req.body.username;
-    if (req.body.email) userList.email = req.body.email;
-    
+    if (req.body.username) updateFiles.username = req.body.username;
+    if (req.body.email) updateFiles.email = req.body.email;
     if (req.body.password) {
       const saltRounds = 10;
-      userList.password = await bcrypt.hash(req.body.password, saltRounds);
+      updateFiles.password = await bcrypt.hash(req.body.password, saltRounds);
     }
-
-    readFile.users.splice(objectIndexSearchElem.value, 1, userList);
-    await UsersServices.createUser(readFile);
-    
+    const result = await UsersServices.updateData(targetId, updateFiles)
+        
     res.send("Данные пользователя успешно обновлены");
   } catch (error) {
     Sentry.captureException(error);
     res.status(500).json({ message: "Ошибка обновления данных" });
   }
 }
-
-
-
-async updateUserData(req, res) {
-  try {
-    const targetId = req.params.id;
-    const userList = await UsersServices.getUserByID(targetId);
+  // // ВЕРСИЯ ДЛЯ ЧТЕНИЯ ИЗ ФАЙЛА examle
+// async updateUserData(req, res) {
+//   try {
+//     const targetId = req.params.id;
+//     const userList = await UsersServices.getUserByID(targetId);
     
-    if (!userList) {
-      return res.status(404).send("В базе данных пользователь не найден!");
-    }
+//     if (!userList) {
+//       return res.status(404).send("В базе данных пользователь не найден!");
+//     }
 
-    const readFile = await UsersServices.getUsers();
-    const objectIndexSearchElem = await UsersServices.getIndexUserByID(targetId);
+//     const readFile = await UsersServices.getUsers();
+//     const objectIndexSearchElem = await UsersServices.getIndexUserByID(targetId);
     
-    // Обновляем только переданные поля
-    if (req.body.username) userList.username = req.body.username;
-    if (req.body.email) userList.email = req.body.email;
+//     // Обновляем только переданные поля
+//     if (req.body.username) userList.username = req.body.username;
+//     if (req.body.email) userList.email = req.body.email;
     
-    if (req.body.password) {
-      const saltRounds = 10;
-      userList.password = await bcrypt.hash(req.body.password, saltRounds);
-    }
+//     if (req.body.password) {
+//       const saltRounds = 10;
+//       userList.password = await bcrypt.hash(req.body.password, saltRounds);
+//     }
 
-    readFile.users.splice(objectIndexSearchElem.value, 1, userList);
-    await UsersServices.createUser(readFile);
+//     readFile.users.splice(objectIndexSearchElem.value, 1, userList);
+//     await UsersServices.createUser(readFile);
     
-    res.send("Данные пользователя успешно обновлены");
-  } catch (error) {
-    Sentry.captureException(error);
-    res.status(500).json({ message: "Ошибка обновления данных" });
-  }
-}
+//     res.send("Данные пользователя успешно обновлены");
+//   } catch (error) {
+//     Sentry.captureException(error);
+//     res.status(500).json({ message: "Ошибка обновления данных" });
+//   }
+// }
 
 
   //Изменение пароля конкретного пользователя: (Update-PATCH)

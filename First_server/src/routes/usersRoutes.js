@@ -3,6 +3,7 @@ const router = express.Router();
 const {UsersControllers} = require("../controllers/usersControllers");
 const UsersRoutesValidation = require("../helpers/usersRoutesValidation")
 const authenticateToken = require("../middleware/authenticateToken")
+const handleValidationErrors = require('../middleware/validationMiddleware');
 
 
 
@@ -69,7 +70,7 @@ const authenticateToken = require("../middleware/authenticateToken")
  * 
  * 
  */
-router.post("/register", UsersRoutesValidation.validateDataCreateUser(),UsersControllers.createUsers);
+router.post("/register", UsersRoutesValidation.validateDataCreateUser(), handleValidationErrors, UsersControllers.createUsers);
 
 /**
  * @swagger
@@ -131,7 +132,11 @@ router.get("/",authenticateToken, UsersControllers.getUsers);
  *        500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.get("/:id", UsersControllers.getUserByID);
+
+    router.get(
+        '/:id',
+        UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.getUserByID);
+
 /**
  * @swagger
  * /api/users/{id}:
@@ -157,7 +162,20 @@ router.get("/:id", UsersControllers.getUserByID);
  *        500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.put("/:id", UsersControllers.updateUserData);
+
+router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(),UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.updateUserData);
+
+// router.put("/:id", 
+// UsersRoutesValidation.validateIdParam(),
+// UsersRoutesValidation.validateDataUpdateUser(),
+// (req, res, next) => {
+//   const errors = validationResult(req);
+//   if (!errors.isEmpty()) {
+//     return res.status(400).json({ errors: errors.array() });
+//   }
+//   next();
+// },
+// UsersControllers.updateUserData);
 /**
  * @swagger
  * /api/users/{id}:
