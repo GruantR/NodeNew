@@ -3,7 +3,7 @@ const MongoClient = require("mongodb").MongoClient;
 const mongoHelper = {
   async getConnection() {
     return MongoClient.connect(process.env.MONGO_CONNECTION_STRING, {
-      useUnifiedTopology: true,
+     // useUnifiedTopology: true,
     });
   },
   useDefaultDb(connection) {
