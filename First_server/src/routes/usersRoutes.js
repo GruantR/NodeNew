@@ -133,9 +133,7 @@ router.get("/",authenticateToken, UsersControllers.getUsers);
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
 
-    router.get(
-        '/:id',
-        UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.getUserByID);
+    router.get('/:id', UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.getUserByID);
 
 /**
  * @swagger
@@ -206,7 +204,7 @@ router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(),UsersRoutesVal
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id", UsersControllers.updateUserPassword);
+router.patch("/:id", UsersRoutesValidation.validateIdParam(), UsersRoutesValidation.validateDataPasswordUpdateUser(), handleValidationErrors, UsersControllers.updateUserPassword);
 /**
  * @swagger
  * /api/users/{id}:
@@ -228,6 +226,6 @@ router.patch("/:id", UsersControllers.updateUserPassword);
  *        500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.delete("/:id", UsersControllers.deleteUser);
+router.delete("/:id", UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.deleteUser);
 
 module.exports = router;
