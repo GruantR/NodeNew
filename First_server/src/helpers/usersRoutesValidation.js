@@ -33,6 +33,15 @@ class UsersRoutesValidation {
     ];
   };
 
+  validateDataPasswordUpdateUser() {
+    return [
+      body("password")
+      .exists()
+      .isLength({ min: 6 })
+      .withMessage('Пароль не может быть короче 6 символов'),
+    ];
+  };
+
   validateIdParam() {
 return [
   param("id").isLength({ min: 24, max: 24 })
