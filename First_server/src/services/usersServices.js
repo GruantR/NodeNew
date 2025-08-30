@@ -42,7 +42,7 @@ class UsersServices {
     return data;
   }
 
-  // Метод для получения (чтения) списка ВСЕХ пользователей: (массив объектов)
+  // Метод для получения (чтения) списка ВСЕХ пользователей: 
   async getUsers() {
     const connection = await getConnection();
     const db = useDefaultDb(connection);
