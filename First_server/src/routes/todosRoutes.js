@@ -81,10 +81,6 @@ router.get("/",authenticateToken, TodosControllers.getTodosSpecificUser);
  *                 type: string
  *                 example: goToSleep
  *                 description: Название-заголовок
- *               isCompleted:
- *                 type: boolean
- *                 example: false
- *                 description: Отметка о выполнении
  * 
  * 
  */
@@ -93,7 +89,7 @@ router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(
  * @swagger
  * /api/todos/{id}:
  *   patch:
- *     summary: Наверное изменения описания задачи
+ *     summary: Изменить задачу (переименовать её)
  *     description: Любое описание...
  *     tags:
  *        - Todos 
@@ -177,4 +173,4 @@ router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.valida
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.delete("/:id",authenticateToken,TodosControllers.deleteTodosByID)
+router.delete("/:id",authenticateToken, todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.deleteTodosByID)
