@@ -3,12 +3,31 @@ const router = express.Router();
 module.exports = router
 const TodosControllers = require("../controllers/todosControllers");
 const TodosRoutesValidation = require("../helpers/todosRoutesValidation")
-const authenticateToken = require("../middleware/authenticateToken")
+const authenticateToken = require("../middleware/authenticateToken");
+const todosRoutesValidation = require("../helpers/todosRoutesValidation");
+const handleValidationErrors = require('../middleware/validationMiddleware');
+/**
+ * @swagger
+ * /api/todos/all:
+ *   get:
+ *     summary: Получить таски всех пользвателей
+ *     description: бла бла бла...
+ *     tags:
+ *       - Todos
+ *     responses:
+ *       200:
+ *         description: ОК - Лови свои таски БРО
+ *       401:
+ *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       500:
+ *         description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
+ */
+router.get("/all", TodosControllers.getTodos);
 /**
  * @swagger
  * /api/todos:
  *   get:
- *     summary: Получить список всех СВОИХ тасок
+ *     summary: Получить список СВОИХ тасок
  *     description: бла бла бла...
  *     tags:
  *       - Todos
@@ -74,7 +93,7 @@ router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(
  * @swagger
  * /api/todos/{id}:
  *   patch:
- *     summary: Переименовываем название задания по ID этого задания
+ *     summary: Наверное изменения описания задачи
  *     description: Любое описание...
  *     tags:
  *        - Todos 
@@ -131,7 +150,7 @@ router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchT
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id/isCompleted", authenticateToken, TodosControllers.patchIsCompletedTodos);
+router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.patchIsCompletedTodos);
 /**
  * @swagger
  * /api/todos/{id}:

@@ -6,6 +6,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
+const { ObjectId } = require('mongodb');
 
 class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
@@ -61,7 +62,7 @@ class UsersControllers {
         return res.status(401).json({ message: "Неверный email или пароль" });
       }
       // Создание JWT-токена:
-      const token = jwt.sign({ userId: user.id }, process.env.SECRET_KEY, {});
+      const token = jwt.sign({ userId: user._id.toString() }, process.env.SECRET_KEY, {expiresIn: "24h" }); 
       res.send({ token });
     } catch (error) {
       Sentry.captureException(error, {
