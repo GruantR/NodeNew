@@ -29,15 +29,12 @@ class UsersServices {
   }
 
   // Метод удаления пользователей из базы по id:
-  async deleteData(id, deleteUser) {
+  async deleteData(id) {
     const connection = await getConnection();
     const db = useDefaultDb(connection);
     const data = await db
       .collection(this.#COLLECTION)
-      .deleteOne(
-        { _id: ObjectId.createFromHexString(id) },
-        { $set: deleteUser }
-      );
+      .deleteOne({ _id: ObjectId.createFromHexString(id) });
     connection.close();
     return data;
   }

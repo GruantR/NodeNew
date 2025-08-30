@@ -57,55 +57,51 @@ class TodosControllers {
 
 
 
-
+  // Метод изменения названия (переименовать) задания
   async patchTitleTodos (req, res) {    
-    const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
-    if (findIndexTodos.searchIdTodos < 0) {
-        return res.status(401).json({message: "В базе нет задания с таким ID"})
+    try {
+      const taskId = req.params.id;
+      const userId = req.userId;
+  
+      // 1. Получаем задачу по ID
+      const task = await TodosServices.getTodoById(taskId);
+      
+      // 2. Если задача не найдена
+      if (!task) {
+        return res.status(404).send("Таска с указанным идентификатором не найдена");
+      }
+      
+      // 3. Проверяем, принадлежит ли задача пользователю
+      if (task.userId.toString() !== userId) {
+        return res.status(403).send("Нет доступа к этой задаче");
+      }
+      
+      // 4. Если все проверки пройдены, обновляем заголовок
+      const updateFiles = {};
+        if (req.body.title) updateFiles.title = req.body.title;
+      
+      await TodosServices.updateTodoTitle(taskId, updateFiles);
+      res.send("Задача успешно переименована");
+  
+  
+    } catch (error) {
+      console.error("Ошибка обновления задачи:", error);
+      
+      // Отправляем ошибку в Sentry
+      Sentry.captureException(error, {
+        extra: {
+          targetId: req.params.id,
+          userId: req.userId,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      
+      res.status(500).json({ message: "Ошибка сервера при обновлении задачи" });
     }
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-    const readFile = await TodosServices.getTodos();
-    const {title} = req.body;
-    readFile.todos[findIndexTodos.searchIdTodos].title = title
-    const result = await TodosServices.createTodos(readFile);
-    res.send(result);
 
   }
   
   
-  // // Метод изменения статуса задания
-  // async patchIsCompletedTodos(req,res) {
-  //   try {
-  //     const taskId = req.params.id;
-  //     const userId = req.userId; // ID текущего пользователя из middleware аутентификации
-      
-  //     const result = await TodosServices.getTodoById(taskId);
-
-  //     if (result) {
-  //       res.json(result);
-  //     } else {
-  //       res.status(404).send("Таска с указанным идентификатором не найдена");
-  //     }
-  //     // if (result.userId.toString() !== userId) {
-  //     //   return res.status(403).send("Нет доступа к этой задаче");
-  //     // }
-
-  //     console.log(userId);
-  //     console.log(result.userId.toString());
-
-  //   } catch (error) {
-  //     Sentry.captureException(error, {
-  //       extra: {
-  //         targetId: req.params.id,
-  //         timestamp: new Date().toISOString(),
-  //       },
-  //     });
-  //     res.status(500).json({ message: "Ошибка поиска пользователя" });
-  //   }
-  // }
 
   // Метод изменения статуса задания
 async patchIsCompletedTodos(req, res) {
@@ -154,16 +150,45 @@ async patchIsCompletedTodos(req, res) {
 
 
 
-
+// Метод удаления таски
   async deleteTodosByID(req,res){
-    const findIndexTodos = await TodosServices.getTodosByID(req.params.id)
-    if (findIndexTodos.searchIdTodos < 0) {
-        return res.status(404).json({message: "Таска с указанным идентификатором не найдена"})
+    try {
+      const taskId = req.params.id;
+      const userId = req.userId;
+  
+      // 1. Получаем задачу по ID
+      const task = await TodosServices.getTodoById(taskId);
+      
+      // 2. Если задача не найдена
+      if (!task) {
+        return res.status(404).send("Таска с указанным идентификатором не найдена");
+      }
+      
+      // 3. Проверяем, принадлежит ли задача пользователю
+      if (task.userId.toString() !== userId) {
+        return res.status(403).send("Нет доступа к этой задаче");
+      }
+      
+      // 4. Если все проверки пройдены, удаляем задачу
+
+      await TodosServices.deleteTodo(taskId);
+      res.send("Задача успешно удалена");
+  
+  
+    } catch (error) {
+      console.error("Ошибка обновления задачи:", error);
+      
+      // Отправляем ошибку в Sentry
+      Sentry.captureException(error, {
+        extra: {
+          targetId: req.params.id,
+          userId: req.userId,
+          timestamp: new Date().toISOString(),
+        },
+      });
+      
+      res.status(500).json({ message: "Ошибка сервера при обновлении задачи" });
     }
-    const readFile = await TodosServices.getTodos();
-    readFile.todos.splice(findIndexTodos.searchIdTodos,1)
-    await TodosServices.createTodos(readFile);
-    res.send('Таска удалена!')
   }
 
 }

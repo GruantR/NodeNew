@@ -171,7 +171,7 @@ class UsersControllers {
       if (!userList) {
         return res.status(404).send("В базе данных пользователь не найден!");
       }
-      await UsersServices.deleteData(targetId, userList);
+      await UsersServices.deleteData(targetId);
       res.send(`Выбранный пользователь удалён! - он не достоин!!!`);
     } catch (error) {
       Sentry.captureException(error);
