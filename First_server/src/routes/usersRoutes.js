@@ -42,6 +42,10 @@ const handleValidationErrors = require('../middleware/validationMiddleware');
  *                 type: string
  *                 example: username
  *                 description: Имя пользователя
+ *               age:
+ *                 type: string
+ *                 example: 18
+ *                 description: Возраст пользователя
  *               email:
  *                 type: string
  *                 example: example@gmail.com
