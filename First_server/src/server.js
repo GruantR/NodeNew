@@ -1,6 +1,8 @@
 const express = require("express");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('../swaggerSpec.js'); 
+const mongoose = require('mongoose');
+const connectDb = require('./config/db.js')
 const app = express();
 const Sentry = require("@sentry/node");
 require("dotenv").config();
@@ -24,9 +26,16 @@ app.use("/api", router);
 
 
 const PORT = process.env.PORT;
-app.listen(PORT, () => {
-  console.log(`Запущен сервер на http://localhost:${PORT}`);
-});
+connectDb()
+
+mongoose.connection.once('open', () => {
+  console.log('Connect mongoose DB')
+  app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
+})
+
+// app.listen(PORT, () => {
+//   console.log(`Запущен сервер на http://localhost:${PORT}`);
+// });
 
 // Быстрый ввод BODY USER>
 // {
