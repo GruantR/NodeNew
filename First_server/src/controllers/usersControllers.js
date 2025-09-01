@@ -6,7 +6,7 @@ const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
-const { ObjectId } = require('mongodb');
+const { ObjectId } = require("mongodb");
 
 class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
@@ -23,6 +23,30 @@ class UsersControllers {
         ...req.body,
         password: hashedPassword,
       };
+
+      // Проверка наличия в системе имеющихся логинов и емаилов
+      const { email, username } = req.body;
+      const validationResult = await UsersServices.validateRegistrationData(
+        email,
+        username
+      );
+
+      if (validationResult) {
+        if (validationResult.email === email) {
+          return res
+            .status(401)
+            .json({ error: "Email уже зарегистрирован в системе" });
+        }
+        if (validationResult.username === username) {
+          return res
+            .status(401)
+            .json({
+              error:
+                "Имя пользователя уже зарегистрировано в системе, выберите другое",
+            });
+        }
+      }
+
       await UsersServices.createUser(newUser);
 
       // Отправляем успешное сообщение
@@ -62,7 +86,11 @@ class UsersControllers {
         return res.status(401).json({ message: "Неверный email или пароль" });
       }
       // Создание JWT-токена:
-      const token = jwt.sign({ userId: user._id.toString() }, process.env.SECRET_KEY, {expiresIn: "24h" }); 
+      const token = jwt.sign(
+        { userId: user._id.toString() },
+        process.env.SECRET_KEY,
+        { expiresIn: "24h" }
+      );
       res.send({ token });
     } catch (error) {
       Sentry.captureException(error, {

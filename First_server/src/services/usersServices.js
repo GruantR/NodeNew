@@ -59,6 +59,17 @@ class UsersServices {
     return data;
   }
 
+    // Метод проверки наличия логина и емейла при регистрации:
+    async validateRegistrationData(newEmail, newUserName) {
+      const connection = await getConnection();
+      const db = useDefaultDb(connection);      
+      const data = await db
+        .collection(this.#COLLECTION)
+        .findOne({$or:[{email: newEmail}, {username: newUserName}]})
+      connection.close();      
+      return data;
+    }
+
   // Метод для получения данных КОНКРЕТНОГО пользователя по email: (объект)
   async getUserByEmail(email) {
     const collection = await getConnection();
