@@ -11,12 +11,12 @@ class UsersServices {
     const newUser = new User(info);
     const result = await newUser.save()
 
-
+    // Код MongoDB
     // const connection = await getConnection();
     // const db = useDefaultDb(connection);
     // await db.collection(this.#COLLECTION).insertOne(info);
     // connection.close();
-    return info;
+    return result;
   }
 
   // Метод обновления данных пользователей:
@@ -46,11 +46,14 @@ class UsersServices {
 
   // Метод для получения (чтения) списка ВСЕХ пользователей: 
   async getUsers() {
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    const data = await db.collection(this.#COLLECTION).find({}).toArray();
-    connection.close();
-    return data;
+    const users = await User.find({})
+    return users;
+
+  //   const connection = await getConnection();
+  //   const db = useDefaultDb(connection);
+  //   const data = await db.collection(this.#COLLECTION).find({}).toArray();
+  //   connection.close();
+  //   return data;
   }
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по ID: (объект)
