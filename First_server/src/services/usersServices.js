@@ -2,7 +2,7 @@ const fs = require("fs");
 const FileHelper = require("../helpers/fileHelper");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 const { ObjectId } = require("mongodb");
-const User = require("../models/users")
+const User = require("../models/User")
 class UsersServices {
   #COLLECTION = "users";
 

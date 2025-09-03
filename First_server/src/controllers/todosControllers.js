@@ -32,7 +32,7 @@ class TodosControllers {
 
     const newTodo = {
     ...req.body,
-    userId: req.userId, // ID пользователя из middleware
+    user: req.userId, // ID пользователя из middleware
     completed: false, // по умолчанию задача не выполнена
     createdAt: new Date(),
     updatedAt: new Date()
