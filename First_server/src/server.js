@@ -33,6 +33,12 @@ mongoose.connection.once('open', () => {
   app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
 })
 
+// Для локальной машины
+// mongoose.connection.once('open', () => {
+//   console.log('Connect mongoose DB')
+//   app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
+// })
+
 // app.listen(PORT, () => {
 //   console.log(`Запущен сервер на http://localhost:${PORT}`);
 // });
