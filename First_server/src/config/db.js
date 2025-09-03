@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 require("dotenv").config();
 
 //const MONGO_URL = 'mongodb://localhost:27017/test-app'
-const MONGO_URL = `${process.env.MONGO_CONNECTION_STRING}/${process.env.MONGO_DB_NAME}`
+//const MONGO_URL = `${process.env.MONGO_CONNECTION_STRING}/${process.env.MONGO_DB_NAME}`
+const MONGO_URL = `${process.env.MONGO_URL}`
 console.log('MONGO_URL:', MONGO_URL)
 
 async function connectDb () {
