@@ -3,7 +3,7 @@ const fs = require("fs");
 const FileHelper = require("../helpers/fileHelper");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 const { ObjectId } = require("mongodb");
-const Todos = require("../models/todos")
+const Todos = require("../models/Todo")
 
 
 class TodosServices {
@@ -11,16 +11,20 @@ class TodosServices {
 
 // Метод создания нового задания
   async createTodos(info) {
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    await db.collection(this.#COLLECTION).insertOne(info);
-    connection.close();
-    return info;
+    const newTodo = new Todos(info);
+    const result = await newTodo.save()
+    return result
+    // Код MongoDB
+    // const connection = await getConnection();
+    // const db = useDefaultDb(connection);
+    // await db.collection(this.#COLLECTION).insertOne(info);
+    // connection.close();
+    // return info;
   }
 
 // Метод получения списка всех заданий
   async getTodos() {
-    const todos = await Todos.find({})
+    const todos = await Todos.find({}).populate('user')
     return todos;
 
     // Код MongoDB
