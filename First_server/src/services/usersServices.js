@@ -21,27 +21,41 @@ class UsersServices {
 
   // Метод обновления данных пользователей:
   async updateData(id, updateData) {
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    const data = await db
-      .collection(this.#COLLECTION)
+    const data = await User
       .updateOne(
         { _id: ObjectId.createFromHexString(id) },
         { $set: updateData }
       );
-    connection.close();
     return data;
+
+
+    // Код MongoDB
+    // const connection = await getConnection();
+    // const db = useDefaultDb(connection);
+    // const data = await db
+    //   .collection(this.#COLLECTION)
+    //   .updateOne(
+    //     { _id: ObjectId.createFromHexString(id) },
+    //     { $set: updateData }
+    //   );
+    // connection.close();
+    // return data;
   }
 
   // Метод удаления пользователей из базы по id:
   async deleteData(id) {
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    const data = await db
-      .collection(this.#COLLECTION)
+    const data = await User
       .deleteOne({ _id: ObjectId.createFromHexString(id) });
-    connection.close();
     return data;
+
+
+    // const connection = await getConnection();
+    // const db = useDefaultDb(connection);
+    // const data = await db
+    //   .collection(this.#COLLECTION)
+    //   .deleteOne({ _id: ObjectId.createFromHexString(id) });
+    // connection.close();
+    // return data;
   }
 
   // Метод для получения (чтения) списка ВСЕХ пользователей: 
@@ -58,32 +72,38 @@ class UsersServices {
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по ID: (объект)
   async getUserByID(id) {
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    const data = await db
-      .collection(this.#COLLECTION)
+    const data = await User
       .findOne({ _id: ObjectId.createFromHexString(id) });
-    connection.close();
     return data;
+
+
+    // const connection = await getConnection();
+    // const db = useDefaultDb(connection);
+    // const data = await db
+    //   .collection(this.#COLLECTION)
+    //   .findOne({ _id: ObjectId.createFromHexString(id) });
+    // connection.close();
+    // return data;
   }
 
     // Метод проверки наличия логина и емейла при регистрации:
-    async validateRegistrationData(newEmail, newUserName) {
-      const connection = await getConnection();
-      const db = useDefaultDb(connection);      
-      const data = await db
-        .collection(this.#COLLECTION)
-        .findOne({$or:[{email: newEmail}, {username: newUserName}]})
-      connection.close();      
-      return data;
+    async validateRegistrationData(newEmail, newUserName) {    
+      const data = await User
+        .findOne({$or:[{email: newEmail}, {username: newUserName}]})   
+      return data;   
+
+      // const connection = await getConnection();
+      // const db = useDefaultDb(connection);      
+      // const data = await db
+      //   .collection(this.#COLLECTION)
+      //   .findOne({$or:[{email: newEmail}, {username: newUserName}]})
+      // connection.close();   
+      //return data;
     }
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по email: (объект)
   async getUserByEmail(email) {
-    const collection = await getConnection();
-    const db = useDefaultDb(collection);
-    const data = await db
-      .collection(this.#COLLECTION)
+    const data = await User
       .findOne({ email: email });
     return data;
   }
