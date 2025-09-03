@@ -14,6 +14,7 @@ class TodosServices {
     const newTodo = new Todos(info);
     const result = await newTodo.save()
     return result
+
     // Код MongoDB
     // const connection = await getConnection();
     // const db = useDefaultDb(connection);
@@ -38,12 +39,15 @@ class TodosServices {
   }
 // Метод получения конкретных тасок конкретного пользователя
   async getTodosSpecificUser(id){
-    
-    const connection = await getConnection();
-    const db = useDefaultDb(connection);
-    const data = await db.collection(this.#COLLECTION).find({userId: id}).toArray();
-    connection.close();
+    const data = await Todos.find({user: id});
     return data
+
+    // Код MongoDB
+    // const connection = await getConnection();
+    // const db = useDefaultDb(connection);
+    // const data = await db.collection(this.#COLLECTION).find({userId: id}).toArray();
+    // connection.close();
+    // return data
   }
 
   // Метод получения таски по ее ID

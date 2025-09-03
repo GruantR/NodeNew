@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 //const Schema = mongoose.Schema;
 const { Schema, model } = mongoose;
-const User = require("./User"); // Импортируем модель User
 
 const todosSchema = new Schema({
     title: String,
@@ -15,6 +14,6 @@ user: {
 });
 
 //Создание модели
-const TodosModel = model('Todo', todosSchema);
+const TodosModel = model('Todo', todosSchema); // имя указанное переходит в нижний регистр и создает коллекцию
 
 module.exports = TodosModel;
