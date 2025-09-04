@@ -176,6 +176,7 @@ class UsersControllers {
       if (!userList) {
         return res.status(404).send("В базе данных пользователь не найден!");
       }
+      
       const updateFiles = {};
       // Обновляем только переданные поля
       if (req.body.password) {
