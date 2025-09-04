@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const {UsersControllers} = require("../controllers/usersControllers");
-const UsersRoutesValidation = require("../helpers/usersRoutesValidation")
 const authenticateToken = require("../middleware/authenticateToken")
 const handleValidationErrors = require('../middleware/validationMiddleware');
+const UsersRoutesValidation = require("../helpers/usersRoutesValidation")
+const {UsersControllers} = require("../controllers/usersControllers");
 
 
 
@@ -22,7 +22,7 @@ const handleValidationErrors = require('../middleware/validationMiddleware');
  *          description: ОК - Таска успешно создана
  *        400:
  *          description: Bad Request - проверьте вводимые данные
- *        404:
+ *        409:
  *          description: Error - такой пользователь уже существует
  *        500:
  *          description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
@@ -110,6 +110,10 @@ router.post("/login" ,UsersControllers.loginUser);
  *     responses:
  *       200:
  *         description: ОК - Лови бро массив объектов пользователей из БД
+ *       401:
+ *          description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       403:
+ *          description: Forbidden - Токен не корректен
  *       500:
  *         description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
  */

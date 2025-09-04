@@ -1,6 +1,6 @@
 const { body } = require("express-validator");
-const { param } = require('express-validator');
-const { ObjectId } = require('mongodb');
+const { param } = require("express-validator");
+const { ObjectId } = require("mongodb");
 
 class UsersRoutesValidation {
   validateDataCreateTodos() {

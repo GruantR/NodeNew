@@ -1,74 +1,11 @@
 const express = require("express");
-const TodosServices = require("../services/todosServices");
 const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
+const TodosServices = require("../services/todosServices");
+const checkTaskOwnership = require("../helpers/taskOwnershipMiddleware");
 
 class TodosControllers {
-  // Потом отвлекись и изучи еще раз эту шляпу
-  constructor() {
-    this.patchTitleTodos = this.patchTitleTodos.bind(this);
-    this._validateTaskAccess = this._validateTaskAccess.bind(this);
-    this._handleError = this._handleError.bind(this);
-    this.patchIsCompletedTodos = this.patchIsCompletedTodos.bind(this);
-    this.deleteTodosByID = this.deleteTodosByID.bind(this);
-  }
-
-  // Вспомогательный метод для проверки прав доступа к задаче
-  async _validateTaskAccess(taskId, userId) {
-    // 1. Получаем задачу по ID
-    const task = await TodosServices.getTodoById(taskId);
-
-    // 2. Если задача не найдена
-    if (!task) {
-      throw new Error("TASK_NOT_FOUND");
-    }
-
-    // 3. Проверяем, принадлежит ли задача пользователю
-    if (task.user.toString() !== userId) {
-      throw new Error("ACCESS_DENIED");
-    }
-    return task;
-
-    // Код mongoDB
-    // const taskId = req.params.id;
-    // const userId = req.userId;
-
-    // // 1. Получаем задачу по ID
-    // const task = await TodosServices.getTodoById(taskId);
-
-    // // 2. Если задача не найдена
-    // if (!task) {
-    //   return res.status(404).send("Таска с указанным идентификатором не найдена");
-    // }
-
-    // // 3. Проверяем, принадлежит ли задача пользователю
-    // if (task.userId.toString() !== userId) {
-    //   return res.status(403).send("Нет доступа к этой задаче");
-    // }
-
-    // // 4. Если все проверки пройдены, обновляем заголовок
-    // const updateFiles = {};
-    //   if (req.body.title) updateFiles.title = req.body.title;
-
-    // await TodosServices.updateTodoTitle(taskId, updateFiles);
-    // res.send("Задача успешно переименована");
-  }
-  // Универсальный обработчик ошибок
-  _handleError(error, res) {
-    if (error.message === "TASK_NOT_FOUND") {
-      return res
-        .status(404)
-        .send("Таска с указанным идентификатором не найдена");
-    } else if (error.message === "ACCESS_DENIED") {
-      return res.status(403).send("Доступ запрещен");
-    } else {
-      console.error(error); // Логируем неожиданные ошибки
-      return res.status(500).send("Внутренняя ошибка сервера");
-    }
-  }
-
   // Метод получения всех тасок ВСЕХ ВСЕХ ВСЕХ пользователей
-
   async getTodos(req, res) {
     const result = await TodosServices.getTodos();
     res.send(result);
@@ -116,16 +53,18 @@ class TodosControllers {
     try {
       const taskId = req.params.id;
       const userId = req.userId;
-      const task = await this._validateTaskAccess(taskId, userId);
+      // Проверка принадлежности задачи
+      const task = await checkTaskOwnership.checkTaskAccess(taskId, userId);
       //Если все проверки пройдены, обновляем заголовок
-      const updateFiles = {};
-      if (req.body.title) updateFiles.title = req.body.title;
+      const updateFields = {};
+      if (req.body.title) updateFields.title = req.body.title;
 
-      await TodosServices.updateTodoTitle(taskId, updateFiles);
+      await TodosServices.updateTodoTitle(taskId, updateFields);
       res.send("Задача успешно переименована");
     } catch (error) {
-      this._handleError(error, res); // Используем обработчик
-
+      if (error.statusCode === 403 || error.statusCode === 404) {
+        return res.status(error.statusCode).send(error.message);
+      }
       // Отправляем ошибку в Sentry
       Sentry.captureException(error, {
         extra: {
@@ -144,13 +83,14 @@ class TodosControllers {
     try {
       const taskId = req.params.id;
       const userId = req.userId;
-      const task = await this._validateTaskAccess(taskId, userId);
+      const task = await checkTaskOwnership.checkTaskAccess(taskId, userId);
       const newCompletedStatus = !task.completed;
       await TodosServices.updateTodoStatus(taskId, newCompletedStatus);
       res.send("Статус задачи успешно изменён");
     } catch (error) {
-      this._handleError(error, res); // Используем обработчик
-
+      if (error.statusCode === 403 || error.statusCode === 404) {
+        return res.status(error.statusCode).send(error.message);
+      }
       // Отправляем ошибку в Sentry
       Sentry.captureException(error, {
         extra: {
@@ -169,15 +109,14 @@ class TodosControllers {
     try {
       const taskId = req.params.id;
       const userId = req.userId;
-
-      const task = await this._validateTaskAccess(taskId, userId);
-
+      const task = await checkTaskOwnership.checkTaskAccess(taskId, userId);
       //Если все проверки пройдены, удаляем задачу
       await TodosServices.deleteTodo(taskId);
       res.send("Задача успешно удалена");
     } catch (error) {
-      this._handleError(error, res); // Используем обработчик
-
+      if (error.statusCode === 403 || error.statusCode === 404) {
+        return res.status(error.statusCode).send(error.message);
+      }
       // Отправляем ошибку в Sentry
       Sentry.captureException(error, {
         extra: {
