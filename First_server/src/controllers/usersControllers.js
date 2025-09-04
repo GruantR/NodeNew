@@ -34,12 +34,12 @@ class UsersControllers {
       if (validationResult) {
         if (validationResult.email === email) {
           return res
-            .status(401)
+            .status(409)
             .json({ error: "Email уже зарегистрирован в системе" });
         }
         if (validationResult.username === username) {
           return res
-            .status(401)
+            .status(409)
             .json({
               error:
                 "Имя пользователя уже зарегистрировано в системе, выберите другое",

@@ -1,4 +1,5 @@
 const fs = require("fs");
+
 class FileHelper {
   readFile(nameFile) {
     return new Promise((res, rej) => {

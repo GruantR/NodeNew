@@ -1,9 +1,9 @@
 const express = require("express");
 const fs = require("fs");
-const FileHelper = require("../helpers/fileHelper");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 const { ObjectId } = require("mongodb");
 const Todos = require("../models/Todo");
+const FileHelper = require("../helpers/fileHelper");
 
 class TodosServices {
   #COLLECTION = "todos";
@@ -13,51 +13,23 @@ class TodosServices {
     const newTodo = new Todos(info);
     const result = await newTodo.save();
     return result;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // await db.collection(this.#COLLECTION).insertOne(info);
-    // connection.close();
-    // return info;
   }
 
   // Метод получения списка всех заданий
   async getTodos() {
     const todos = await Todos.find({}).populate("user");
     return todos;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const data = await db.collection(this.#COLLECTION).find({}).toArray();
-    // connection.close();
-    // return data
   }
   // Метод получения конкретных тасок конкретного пользователя
   async getTodosSpecificUser(id) {
     const data = await Todos.find({ user: id });
     return data;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const data = await db.collection(this.#COLLECTION).find({userId: id}).toArray();
-    // connection.close();
-    // return data
   }
 
   // Метод получения таски по ее ID
   async getTodoById(id) {
     const data = await Todos.findOne({ _id: ObjectId.createFromHexString(id) });
     return data;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const data = await db.collection(this.#COLLECTION).findOne({ _id: ObjectId.createFromHexString(id) });
-    // connection.close();
-    // return data
   }
 
   // Метод обновления статуса выполнения таски:
@@ -68,18 +40,6 @@ class TodosServices {
     );
 
     return data;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const data = await db
-    //   .collection(this.#COLLECTION)
-    //   .updateOne(
-    //     { _id: ObjectId.createFromHexString(id) },
-    //     { $set: {completed: isCompleted, updatedAt: new Date()} }
-    //   );
-    // connection.close();
-    // return data;
   }
 
   // Метод изменения (переименовать) названия задания:
@@ -93,38 +53,12 @@ class TodosServices {
       { $set: updateWithTimestamp }
     );
     return data;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const updateWithTimestamp = {
-    //   ...updateData,
-    //   updatedAt: new Date() // Всегда устанавливаем текущую дату/время
-    // };
-    // const data = await db
-    //   .collection(this.#COLLECTION)
-    //   .updateOne(
-    //     { _id: ObjectId.createFromHexString(id) },
-    //     { $set: updateWithTimestamp }
-    //   );
-    // connection.close();
-    // return data;
   }
 
   // Метод удаления таски по id:
   async deleteTodo(taskId) {
     const data = Todos.deleteOne({ _id: ObjectId.createFromHexString(taskId) });
     return data;
-
-    // Код MongoDB
-    // const connection = await getConnection();
-    // const db = useDefaultDb(connection);
-    // const data = await db
-
-    //   .collection(this.#COLLECTION)
-    //   .deleteOne({ _id: ObjectId.createFromHexString(id) });
-    // connection.close();
-    // return data;
   }
 }
 module.exports = new TodosServices();

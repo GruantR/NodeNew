@@ -11,14 +11,12 @@ const handleValidationErrors = require('../middleware/validationMiddleware');
  * /api/todos/all:
  *   get:
  *     summary: Получить таски всех пользвателей
- *     description: бла бла бла...
+ *     description: Свободный доступ ко всем задачам
  *     tags:
  *       - Todos
  *     responses:
  *       200:
  *         description: ОК - Лови свои таски БРО
- *       401:
- *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
  *       500:
  *         description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
  */
@@ -28,7 +26,7 @@ router.get("/all", TodosControllers.getTodos);
  * /api/todos:
  *   get:
  *     summary: Получить список СВОИХ тасок
- *     description: бла бла бла...
+ *     description: Только свои таски
  *     tags:
  *       - Todos
  *     security:
@@ -38,6 +36,8 @@ router.get("/all", TodosControllers.getTodos);
  *         description: ОК - Лови свои таски БРО
  *       401:
  *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       403:
+ *         description: Forbidden - Токен не корректен
  *       500:
  *         description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
  */
@@ -55,14 +55,16 @@ router.get("/",authenticateToken, TodosControllers.getTodosSpecificUser);
  *      requestBody:
  *        $ref: "#/components/requestBodies/TodosRegisterAndEdit"
  *      responses:
- *        200:
+ *        201:
  *          description: ОК - Таска успешно создана
  *        400:
  *          description: Bad Request - проверьте вводимые данные
  *        401:
- *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *          description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *        403:
+ *          description: Forbidden - Токен не корректен
  *        404:
- *          description: Error - такой пользователь уже существует
+ *          description: Error - Такая таска уже существует (ЭТОТ ФИЛЬТР ПРОСИТСЯ НО ПОКА НЕ НАПИСАН)
  *        500:
  *          description: Internal Server Error - Сервер ушёл не попрощавшись. Пожалуйста, попробуйте повторить запрос позже, он вернётся.
  * 
@@ -90,7 +92,7 @@ router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(
  * /api/todos/{id}:
  *   patch:
  *     summary: Изменить задачу (переименовать её)
- *     description: Любое описание...
+ *     description: Введите новое название своей задачи
  *     tags:
  *        - Todos 
  *     security:
@@ -111,21 +113,23 @@ router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(
  *                 type: string
  *     responses:
  *       200:
- *         description: Пароль успешно изменён.
+ *         description: Название задания изменено успещно.
  *       401:
- *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *          description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       403:
+ *          description: Forbidden - Токен не корректен
  *       404:
  *          description: Таска с указанным идентификатором не найдена.
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), TodosControllers.patchTitleTodos);
+router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.patchTitleTodos);
 /**
  * @swagger
  * /api/todos/{id}/isCompleted:
  *   patch:
  *     summary: Изменить статус исполнения задания
- *     description: Любое описание...
+ *     description: Жмятки и статус изменится
  *     tags:
  *        - Todos 
  *     security:
@@ -140,7 +144,9 @@ router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchT
  *       200:
  *         description: Статус исполнения успешно изменён.
  *       401:
- *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *          description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       403:
+ *          description: Forbidden - Токен не корректен
  *       404:
  *          description: Таска с указанным идентификатором не найдена.
  *       500:
@@ -152,7 +158,7 @@ router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.valida
  * /api/todos/{id}:
  *   delete:
  *     summary: Удаляем задание
- *     description: Любое описание...
+ *     description: Скажи пока заданию
  *     tags:
  *        - Todos 
  *     security:
@@ -165,9 +171,11 @@ router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.valida
  *         description: Идентификатор таски.
  *     responses:
  *       200:
- *         description: Статус исполнения успешно изменён.
+ *         description: Задача успешно удалена
  *       401:
- *         description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *          description: Unauthorized - Ты не пройдешь, предъяви пропуск
+ *       403:
+ *          description: Forbidden - Токен не корректен
  *       404:
  *          description: Таска с указанным идентификатором не найдена.
  *       500:
