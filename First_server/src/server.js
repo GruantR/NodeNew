@@ -2,6 +2,7 @@ const express = require("express");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('../swaggerSpec.js'); 
 const mongoose = require('mongoose');
+const sequelize = require('../src/config/db.js')
 const connectDb = require('./config/db.js')
 const app = express();
 const Sentry = require("@sentry/node");
@@ -26,9 +27,18 @@ app.use("/api", router);
 
 
 const PORT = process.env.PORT;
-connectDb()
+// connectDb()
 
-mongoose.connection.once('open', () => {
-  console.log('Connect mongoose DB')
-  app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
-})
+// mongoose.connection.once('open', () => {
+//   console.log('Connect mongoose DB')
+//   app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
+// })
+
+sequelize
+  .authenticate()
+  .then(() => {
+    console.log('DB connected!')
+  })
+  .catch(err => console.log('error: ', err.message))
+
+app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))

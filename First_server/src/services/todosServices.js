@@ -2,8 +2,9 @@ const express = require("express");
 const fs = require("fs");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 const { ObjectId } = require("mongodb");
-const Todos = require("../models/Todo");
+//const Todos = require("../models/Todo");
 const FileHelper = require("../helpers/fileHelper");
+const {Todos} = require('../models/models')
 
 class TodosServices {
   #COLLECTION = "todos";
