@@ -12,10 +12,16 @@ class UsersServices {
 
   // Метод добавления (записи) новых пользователей:
   async createUser(info) {
+    const newUser = await User.create(info);
+    return newUser;
+  }
+
+  async createUser(info) {
     const newUser = new User(info);
     const result = await newUser.save();
     return result;
   }
+ 
 
   // Метод обновления данных пользователей:
   async updateData(id, updateData) {
