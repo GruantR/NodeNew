@@ -23,6 +23,12 @@ const sequelize = new Sequelize(
   {
     host: process.env.HOST,
     dialect: process.env.DIALECT,
+    logging: (msg) => {
+      // Выводим только SQL-запросы, игнорируем метаданные
+      if (msg.includes('SELECT') || msg.includes('INSERT') || msg.includes('UPDATE') || msg.includes('DELETE')) {
+        console.log(msg);
+      }
+    },
   }
 );
 

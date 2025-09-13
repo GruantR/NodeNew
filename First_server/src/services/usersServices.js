@@ -16,11 +16,11 @@ class UsersServices {
     return newUser;
   }
 
-  async createUser(info) {
-    const newUser = new User(info);
-    const result = await newUser.save();
-    return result;
-  }
+  // async createUser(info) {
+  //   const newUser = new User(info);
+  //   const result = await newUser.save();
+  //   return result;
+  // }
  
 
   // Метод обновления данных пользователей:
@@ -42,7 +42,7 @@ class UsersServices {
 
   // Метод для получения (чтения) списка ВСЕХ пользователей:
   async getUsers() {
-    const users = await User.find({});
+    const users = await User.findAll({});
     return users;
   }
 
@@ -62,7 +62,7 @@ class UsersServices {
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по email: (объект)
   async getUserByEmail(email) {
-    const data = await User.findOne({ email: email });
+    const data = await User.findOne({where: { email: email }});    
     return data;
   }
 }

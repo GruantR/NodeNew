@@ -73,10 +73,11 @@ class UsersControllers {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      //
+      
       const { email, password } = req.body;
       // Проверка наличия email
       const user = await UsersServices.getUserByEmail(email);
+
       if (!user) {
         return res.status(401).json({ message: "Неверный email или пароль" });
       }
@@ -87,7 +88,7 @@ class UsersControllers {
       }
       // Создание JWT-токена:
       const token = jwt.sign(
-        { userId: user._id.toString() },
+        { userId: user.id.toString() },
         process.env.SECRET_KEY,
         { expiresIn: "24h" }
       );
@@ -101,7 +102,7 @@ class UsersControllers {
         extra: {
           endpoint: req.path, // Например, "/api/login"
           body: req.body, // Что передал пользователь (email/password)
-          userId: user?.id, // Если user существует
+          //userId: user.id, // Если user существует
         },
       });
 
