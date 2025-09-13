@@ -32,3 +32,5 @@ mongoose.connection.once('open', () => {
   console.log('Connect mongoose DB')
   app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
 })
+
+// ФИНАЛЬНАЯ ВЕСИЯ НА mongoose
