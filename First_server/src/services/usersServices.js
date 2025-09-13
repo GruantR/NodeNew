@@ -15,14 +15,7 @@ class UsersServices {
     const newUser = await User.create(info);
     return newUser;
   }
-
-  // async createUser(info) {
-  //   const newUser = new User(info);
-  //   const result = await newUser.save();
-  //   return result;
-  // }
  
-
   // Метод обновления данных пользователей:
   async updateData(id, updateData) {
     const data = await User.updateOne(

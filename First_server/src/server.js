@@ -27,12 +27,7 @@ app.use("/api", router);
 
 
 const PORT = process.env.PORT;
-// connectDb()
 
-// mongoose.connection.once('open', () => {
-//   console.log('Connect mongoose DB')
-//   app.listen(PORT, () => console.log(`Запущен сервер на http://localhost:${PORT}`))
-// })
 
 sequelize
   .authenticate()
