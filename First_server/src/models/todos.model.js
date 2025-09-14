@@ -1,4 +1,4 @@
-
+//todos.model.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
@@ -14,6 +14,9 @@ const Todo = sequelize.define('Todo', {
   status: {
     type: DataTypes.ENUM('pending', 'inProgress', 'completed'),
     defaultValue: 'pending'
+  },
+  userID: {
+    type: DataTypes.INTEGER,
   }
 });
 

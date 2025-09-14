@@ -83,6 +83,11 @@ router.get("/",authenticateToken, TodosControllers.getTodosSpecificUser);
  *                 type: string
  *                 example: goToSleep
  *                 description: Название-заголовок
+  *               description:
+ *                 type: string
+ *                 example: blablablablabla
+ *                 description: Описание таски
+ * 
  * 
  * 
  */
@@ -123,7 +128,7 @@ router.post("/",authenticateToken,TodosRoutesValidation.validateDataCreateTodos(
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.patchTitleTodos);
+router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchTodosByTitle(), handleValidationErrors, TodosControllers.patchTitleTodos);
 /**
  * @swagger
  * /api/todos/{id}/isCompleted:
@@ -152,7 +157,7 @@ router.patch("/:id", authenticateToken, TodosRoutesValidation.validateDataPatchT
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.patchIsCompletedTodos);
+router.patch("/:id/isCompleted", authenticateToken, handleValidationErrors, TodosControllers.patchIsCompletedTodos);
 /**
  * @swagger
  * /api/todos/{id}:
@@ -181,4 +186,4 @@ router.patch("/:id/isCompleted", authenticateToken, todosRoutesValidation.valida
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.delete("/:id",authenticateToken, todosRoutesValidation.validateIdParam(), handleValidationErrors, TodosControllers.deleteTodosByID)
+router.delete("/:id",authenticateToken, TodosControllers.deleteTodosByID)

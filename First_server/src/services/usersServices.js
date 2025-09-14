@@ -1,10 +1,5 @@
-const fs = require("fs");
-const FileHelper = require("../helpers/fileHelper");
-const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
-const { ObjectId } = require("mongodb");
 const { Op } = require('sequelize');
-//const User = require("../models/User");
-const {User} = require('../models/models')
+const {User} = require('../models/models');
 
 
 
@@ -19,18 +14,13 @@ class UsersServices {
  
   // Метод обновления данных пользователей:
   async updateData(id, updateData) {
-    const data = await User.updateOne(
-      { _id: ObjectId.createFromHexString(id) },
-      { $set: updateData }
-    );
+    const data = await User.update(updateData,{where: {id:id}});
     return data;
   }
 
   // Метод удаления пользователей из базы по id:
   async deleteData(id) {
-    const data = await User.deleteOne({
-      _id: ObjectId.createFromHexString(id),
-    });
+    const data = await User.destroy({where: {id:id}});
     return data;
   }
 
@@ -42,10 +32,10 @@ class UsersServices {
 
   // Метод для получения данных КОНКРЕТНОГО пользователя по ID: (объект)
   async getUserByID(id) {
-    const data = await User.findOne({ _id: ObjectId.createFromHexString(id) });
+    const data = await User.findByPk(id);
     return data;
   }
-  
+
   // Метод для получения данных КОНКРЕТНОГО пользователя по email: (объект)
   async getUserByEmail(email) {
     const data = await User.findOne({

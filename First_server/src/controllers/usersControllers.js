@@ -1,12 +1,11 @@
+//usersControllers.js
 const express = require("express");
 const bcrypt = require("bcrypt");
 const UsersServices = require("../services/usersServices");
-const { v4: uuidv4 } = require("uuid"); // генератор id
 const { validationResult } = require("express-validator");
 const jwt = require("jsonwebtoken");
 const Sentry = require("@sentry/node");
-const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
-const { ObjectId } = require("mongodb");
+
 
 class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
@@ -26,7 +25,7 @@ class UsersControllers {
       // Отправляем успешное сообщение
       res.status(201).json({
         message: "Пользователь успешно зарегистрирован",
-        id: createdUser.id  // ID из записи, созданной в базе данных
+        id: createdUser.id, // ID из записи, созданной в базе данных
       });
     } catch (error) {
       // Логируем ошибку в Sentry
@@ -163,6 +162,7 @@ class UsersControllers {
       const updateFiles = {};
       // Обновляем только переданные поля
       if (req.body.username) updateFiles.username = req.body.username;
+      if (req.body.age) updateFiles.age = req.body.age;
       if (req.body.email) updateFiles.email = req.body.email;
       if (req.body.password) {
         const saltRounds = 10;

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose')
+//db.js
 const Sequelize = require('sequelize')
 require("dotenv").config();
 
@@ -19,5 +19,4 @@ const sequelize = new Sequelize(
   }
 );
 
-//module.exports = connectDb
 module.exports = sequelize

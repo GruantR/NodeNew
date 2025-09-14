@@ -14,11 +14,11 @@ class TaskAccessService {
     }
 
     // 3. Проверяем, принадлежит ли задача пользователю
-    if (task.user.toString() !== userId) {
+    if (task.userID.toString() !== userId) {
       const error = new Error("Нет доступа к этой задаче");
       error.statusCode = 403;
       throw error;
-    }
+    }    
     return task;
   }
 }

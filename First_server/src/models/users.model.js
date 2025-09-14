@@ -1,8 +1,7 @@
-
+//users.model.js
 const { Sequelize, DataTypes } = require('sequelize');
 const sequelize = require('../config/db');
 
-// users.model.js
 const User = sequelize.define('User', {
   username: {
     type: DataTypes.STRING,
@@ -42,7 +41,6 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
-    isEmail: true,
     validate: {
       isEmail: {
         msg: "Некорректный формат email"

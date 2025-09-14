@@ -141,7 +141,7 @@ router.get("/",authenticateToken, UsersControllers.getUsers);
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
 
-    router.get('/:id', UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.getUserByID);
+    router.get('/:id', UsersControllers.getUserByID);
 
 /**
  * @swagger
@@ -169,7 +169,7 @@ router.get("/",authenticateToken, UsersControllers.getUsers);
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
 
-router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(),UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.updateUserData);
+router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(), handleValidationErrors, UsersControllers.updateUserData);
 
 // router.put("/:id", 
 // UsersRoutesValidation.validateIdParam(),
@@ -204,6 +204,7 @@ router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(),UsersRoutesVal
  *             properties:
  *               password:
  *                 type: string
+ *                 example: 123123
  *     responses:
  *       200:
  *         description: Пароль успешно изменён.
@@ -212,7 +213,7 @@ router.put("/:id", UsersRoutesValidation.validateDataUpdateUser(),UsersRoutesVal
  *       500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.patch("/:id", UsersRoutesValidation.validateIdParam(), UsersRoutesValidation.validateDataPasswordUpdateUser(), handleValidationErrors, UsersControllers.updateUserPassword);
+router.patch("/:id", UsersRoutesValidation.validateDataPasswordUpdateUser(), handleValidationErrors, UsersControllers.updateUserPassword);
 /**
  * @swagger
  * /api/users/{id}:
@@ -234,6 +235,6 @@ router.patch("/:id", UsersRoutesValidation.validateIdParam(), UsersRoutesValidat
  *        500:
  *          description: Внутренняя ошибка сервера. Пожалуйста, попробуйте повторить запрос позже.
  */
-router.delete("/:id", UsersRoutesValidation.validateIdParam(), handleValidationErrors, UsersControllers.deleteUser);
+router.delete("/:id", UsersControllers.deleteUser);
 
 module.exports = router;

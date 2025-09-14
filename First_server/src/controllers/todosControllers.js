@@ -1,8 +1,9 @@
+// todosControllers.js
 const express = require("express");
-const { v4: uuidv4 } = require("uuid");
 const { validationResult } = require("express-validator");
 const TodosServices = require("../services/todosServices");
 const checkTaskOwnership = require("../helpers/taskOwnershipMiddleware");
+const Sentry = require("@sentry/node");
 
 class TodosControllers {
   // Метод получения всех тасок ВСЕХ ВСЕХ ВСЕХ пользователей
@@ -32,10 +33,7 @@ class TodosControllers {
 
     const newTodo = {
       ...req.body,
-      user: req.userId, // ID пользователя из middleware
-      completed: false, // по умолчанию задача не выполнена
-      createdAt: new Date(),
-      updatedAt: new Date(),
+      userID: req.userId, // ID пользователя из middleware
     };
 
     try {
@@ -84,8 +82,16 @@ class TodosControllers {
       const taskId = req.params.id;
       const userId = req.userId;
       const task = await checkTaskOwnership.checkTaskAccess(taskId, userId);
-      const newCompletedStatus = !task.completed;
-      await TodosServices.updateTodoStatus(taskId, newCompletedStatus);
+
+      let indexNewStatus = 0;
+      const statusList = ["pending", "inProgress", "completed"];
+      const localStatus = statusList.indexOf(task.status);
+
+      if (localStatus === statusList.length - 1) {
+        indexNewStatus = 0;
+      } else indexNewStatus = localStatus + 1;
+
+      await TodosServices.updateTodoStatus(taskId, statusList[indexNewStatus]);
       res.send("Статус задачи успешно изменён");
     } catch (error) {
       if (error.statusCode === 403 || error.statusCode === 404) {
