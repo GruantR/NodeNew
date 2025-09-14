@@ -12,53 +12,61 @@ class UsersControllers {
   // СОЗДАНИЕ ПОЛЬЗОВАТЕЛЯ (РЕГИСТРАЦИЯ): (CREATE)
   async createUsers(req, res) {
     try {
-      // Проверка валидации осуществляется в роутах
-
       // Хешируем пароль от плохих дядек:
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
 
       const newUser = {
-        // id: uuidv4(), это был id для работы в текстовом редакторе
         ...req.body,
         password: hashedPassword,
       };
 
-      // Проверка наличия в системе имеющихся логинов и емаилов
-      const { email, username } = req.body;
-      const validationResult = await UsersServices.validateRegistrationData(
-        email,
-        username
-      );
-
-      if (validationResult) {
-        if (validationResult.email === email) {
-          return res
-            .status(409)
-            .json({ error: "Email уже зарегистрирован в системе" });
-        }
-        if (validationResult.username === username) {
-          return res
-            .status(409)
-            .json({
-              error:
-                "Имя пользователя уже зарегистрировано в системе, выберите другое",
-            });
-        }
-      }
-
-      await UsersServices.createUser(newUser);
-
+      // Создаем пользователя (здесь может сработать валидация Sequelize)
+      const createdUser = await UsersServices.createUser(newUser);
       // Отправляем успешное сообщение
       res.status(201).json({
         message: "Пользователь успешно зарегистрирован",
-        "Присвоен следующий id: ": newUser._id,
+        id: createdUser.id  // ID из записи, созданной в базе данных
       });
     } catch (error) {
       // Логируем ошибку в Sentry
       Sentry.captureException(error);
 
-      // Возвращаем ошибку пользователю
+      // Обработка ошибок валидации Sequelize
+      if (error.name === "SequelizeValidationError") {
+        const errors = error.errors.map((err) => ({
+          field: err.path,
+          message: err.message,
+        }));
+        return res.status(400).json({
+          message: "Ошибка валидации данных",
+          errors,
+        });
+      }
+
+      // Обработка ошибок уникальности
+      if (error.name === "SequelizeUniqueConstraintError") {
+        // Получаем первое нарушение уникальности (базы данных обычно возвращают только одну ошибку)
+        const field = error.errors[0]?.path;
+
+        // Определяем сообщение в зависимости от поля
+        let message;
+        switch (field) {
+          case "email":
+            message = "Email уже зарегистрирован в системе";
+            break;
+          case "username":
+            message =
+              "Имя пользователя уже зарегистрировано в системе, выберите другое";
+            break;
+          default:
+            message = "Пользователь с такими данными уже существует";
+        }
+
+        return res.status(409).json({ error: message });
+      }
+
+      // Общая ошибка сервера
       return res
         .status(500)
         .json({ message: "Произошла ошибка при регистрации" });
@@ -73,7 +81,7 @@ class UsersControllers {
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
-      
+
       const { email, password } = req.body;
       // Проверка наличия email
       const user = await UsersServices.getUserByEmail(email);
@@ -102,7 +110,7 @@ class UsersControllers {
         extra: {
           endpoint: req.path, // Например, "/api/login"
           body: req.body, // Что передал пользователь (email/password)
-          //userId: user.id, // Если user существует
+          userId: user?.id, // Если user существует
         },
       });
 
@@ -177,7 +185,7 @@ class UsersControllers {
       if (!userList) {
         return res.status(404).send("В базе данных пользователь не найден!");
       }
-      
+
       const updateFiles = {};
       // Обновляем только переданные поля
       if (req.body.password) {

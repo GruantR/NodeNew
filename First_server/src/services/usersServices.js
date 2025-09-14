@@ -2,6 +2,7 @@ const fs = require("fs");
 const FileHelper = require("../helpers/fileHelper");
 const { getConnection, useDefaultDb } = require("../helpers/mongoHelper");
 const { ObjectId } = require("mongodb");
+const { Op } = require('sequelize');
 //const User = require("../models/User");
 const {User} = require('../models/models')
 
@@ -44,18 +45,11 @@ class UsersServices {
     const data = await User.findOne({ _id: ObjectId.createFromHexString(id) });
     return data;
   }
-
-  // Метод проверки наличия логина и емейла при регистрации:
-  async validateRegistrationData(newEmail, newUserName) {
-    const data = await User.findOne({
-      $or: [{ email: newEmail }, { username: newUserName }],
-    });
-    return data;
-  }
-
+  
   // Метод для получения данных КОНКРЕТНОГО пользователя по email: (объект)
   async getUserByEmail(email) {
-    const data = await User.findOne({where: { email: email }});    
+    const data = await User.findOne({
+      where: { email: email }});    
     return data;
   }
 }
