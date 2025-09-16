@@ -1,3 +1,4 @@
+//server.js
 const express = require("express");
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('../swaggerSpec.js'); 
